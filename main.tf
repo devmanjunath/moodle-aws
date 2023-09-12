@@ -13,8 +13,15 @@ locals {
 
 module "network" {
   source          = "./modules/network"
-  name            = "Terraform VPC"
+  name            = "Test-Drive VPC"
   description     = "VPC For Test Drive Powered By Moodle"
   public_subnets  = local.public_subnets
   private_subnets = local.private_subnets
+}
+
+module "efs" {
+  source           = "./modules/efs"
+  name             = "Test-Drive FS"
+  subnets_to_mount = module.network.public_subnets
+  security_group   = [module.network.allow_nfs_sg]
 }
