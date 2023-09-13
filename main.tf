@@ -13,15 +13,29 @@ locals {
 
 module "network" {
   source          = "./modules/network"
-  name            = "Test-Drive VPC"
+  name            = var.project
   description     = "VPC For Test Drive Powered By Moodle"
   public_subnets  = local.public_subnets
   private_subnets = local.private_subnets
 }
 
 module "efs" {
+  depends_on       = [module.network]
   source           = "./modules/efs"
-  name             = "Test-Drive FS"
+  name             = var.project
   subnets_to_mount = module.network.public_subnets
   security_group   = [module.network.allow_nfs_sg]
+}
+
+module "ecs" {
+  depends_on       = [module.network]
+  source           = "./modules/ecs"
+  name             = var.project
+  container_config = var.container_config
+  subnets          = module.network.public_subnets
+  security_group = [
+    module.network.allow_nfs_sg,
+    module.network.allow_web_sg,
+    module.network.allow_ecs_sg
+  ]
 }
