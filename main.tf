@@ -34,6 +34,7 @@ module "ecs" {
   container_config = var.container_config
   subnets          = module.network.public_subnets
   security_group = [
+    module.network.allow_ssh_sg,
     module.network.allow_nfs_sg,
     module.network.allow_web_sg,
     module.network.allow_ecs_sg
