@@ -3,7 +3,7 @@ data "template_file" "user_data" {
 }
 
 resource "aws_launch_configuration" "ecs_launch_config" {
-  image_id             = "ami-0ee5ef2135fd3646b"
+  image_id             = "ami-00cd879d458b963ec"
   iam_instance_profile = aws_iam_instance_profile.ecs_agent.name
   security_groups      = var.security_group
   user_data            = data.template_file.user_data.rendered

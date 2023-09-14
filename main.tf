@@ -31,6 +31,7 @@ module "ecs" {
   depends_on       = [module.network]
   source           = "./modules/ecs"
   name             = var.project
+  vpc_id           = module.network.vpc_id
   container_config = var.container_config
   subnets          = module.network.public_subnets
   security_group = [

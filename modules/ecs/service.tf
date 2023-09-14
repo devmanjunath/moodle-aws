@@ -9,4 +9,9 @@ resource "aws_ecs_service" "ecs_service" {
     subnets         = var.subnets
     security_groups = var.security_group
   }
+  load_balancer {
+    container_name   = "nginx"
+    container_port   = "80"
+    target_group_arn = aws_alb_target_group.alb_public_webservice_target_group.arn
+  }
 }
