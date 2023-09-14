@@ -41,3 +41,16 @@ module "ecs" {
     module.network.allow_ecs_sg
   ]
 }
+
+module "rds" {
+  source  = "./modules/rds"
+  name    = var.project
+  vpc_id  = module.network.vpc_id
+  subnets = module.network.public_subnets
+  security_group = [
+    module.network.allow_ssh_sg,
+    module.network.allow_nfs_sg,
+    module.network.allow_web_sg,
+    module.network.allow_ecs_sg
+  ]
+}
