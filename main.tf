@@ -28,7 +28,7 @@ module "efs" {
 }
 
 module "ecs" {
-  depends_on       = [module.network]
+  depends_on       = [module.network, module.efs]
   source           = "./modules/ecs"
   name             = var.project
   vpc_id           = module.network.vpc_id

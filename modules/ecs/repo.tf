@@ -1,8 +1,5 @@
-resource "aws_ecr_repository" "repo" {
-  # depends_on           = [docker_image.moodle_drive]
-  name                 = lower(var.name)
-  image_tag_mutability = "MUTABLE"
-  force_delete         = true
+data "aws_ecr_repository" "repo" {
+  name = lower(var.name)
 }
 
 # resource "docker_image" "moodle_drive" {

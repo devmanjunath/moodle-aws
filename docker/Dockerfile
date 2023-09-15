@@ -8,6 +8,10 @@ RUN apt install -y software-properties-common
 
 RUN add-apt-repository ppa:ondrej/php
 
+ENV MOODLE_DATABASE_SERVER NONE
+ENV MOODLE_DATABASE_NAME NONE
+ENV MOODLE_DATABASE_USERNAME NONE
+ENV MOODLE_DATABASE_PASSWORD NONE
 ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN true
 
@@ -17,11 +21,21 @@ RUN apt install -y graphviz aspell ghostscript clamav php8.2 php8.2-pspell php8.
 
 COPY php.ini /etc/php/8.2/apache2/php.ini
 
-RUN mkdir /var/moodledata
+WORKDIR /var/www/html
 
-RUN chown -R www-data /var/moodledata
+RUN rm -R *
 
-RUN chmod -R 777 /var/moodledata
+RUN git clone git://git.moodle.org/moodle.git .
+
+RUN git branch --track MOODLE_402_STABLE origin/MOODLE_402_STABLE
+
+RUN git checkout MOODLE_402_STABLE
+
+RUN mkdir /var/www/moodledata
+
+RUN chown -R www-data /var/www/moodledata
+
+RUN chmod -R 777 /var/www/moodledata
 
 RUN chmod -R 777 /var/www/html
 

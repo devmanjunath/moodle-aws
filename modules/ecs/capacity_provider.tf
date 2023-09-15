@@ -1,9 +1,9 @@
 resource "aws_ecs_capacity_provider" "test" {
-  depends_on = [aws_autoscaling_group.failure_analysis_ecs_asg]
+  depends_on = [aws_autoscaling_group.asg]
   name       = "test"
 
   auto_scaling_group_provider {
-    auto_scaling_group_arn = aws_autoscaling_group.failure_analysis_ecs_asg.arn
+    auto_scaling_group_arn = aws_autoscaling_group.asg.arn
     //managed_termination_protection = "ENABLED"
 
     managed_scaling {

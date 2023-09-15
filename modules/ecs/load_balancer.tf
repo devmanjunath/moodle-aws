@@ -7,8 +7,8 @@ resource "aws_lb" "loadbalancer" {
 }
 
 
-resource "aws_alb_target_group" "alb_public_webservice_target_group" {
-  name     = "public-webservice-tg"
+resource "aws_lb_target_group" "target_group" {
+  name     = "http-target-group"
   port     = "80"
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -37,7 +37,7 @@ resource "aws_lb_listener" "lb_listener-webservice-https-redirect" {
   # }
   default_action {
     type             = "forward"
-    target_group_arn = aws_alb_target_group.alb_public_webservice_target_group.id
+    target_group_arn = aws_lb_target_group.target_group.id
   }
 }
 

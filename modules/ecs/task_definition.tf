@@ -6,7 +6,7 @@ data "template_file" "task_definition" {
     host_port      = var.container_config["portMappings"][0]["hostPort"]
     container_port = var.container_config["portMappings"][0]["containerPort"]
     name           = var.container_config["name"]
-    image          = aws_ecr_repository.repo.repository_url
+    image          = data.aws_ecr_repository.repo.repository_url
   }
 }
 
@@ -28,12 +28,20 @@ resource "aws_ecs_task_definition" "task_definition" {
     essential = true,
     mountPoints = [
       {
-        containerPath = "/var/www",
+        containerPath = "/var/www/moodledata",
         sourceVolume  = "efs-Test"
       }
     ],
     name  = var.container_config["name"],
     image = "480174253711.dkr.ecr.ap-south-2.amazonaws.com/test-drive:latest"
+    logConfiguration = {
+      logDriver = "awslogs",
+      options = {
+        awslogs-group = aws_cloudwatch_log_group.example.name
+        awslogs-region = "ap-south-2"
+        awslogs-stream-prefix = "ecs"
+      }
+    }
   }])
   volume {
     name = "efs-Test"

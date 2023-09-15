@@ -4,7 +4,7 @@ unset($CFG);
 global $CFG;
 $CFG = new stdClass();
 
-$CFG->dbtype    = getenv('MOODLE_DATABASE_TYPE');
+$CFG->dbtype    = 'mysqli';
 $CFG->dblibrary = 'native';
 $CFG->dbhost    = getenv('MOODLE_DATABASE_SERVER');
 $CFG->dbname    = getenv('MOODLE_DATABASE_NAME');

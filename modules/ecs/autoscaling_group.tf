@@ -1,5 +1,9 @@
 data "template_file" "user_data" {
   template = file("${path.module}/user_data.tpl")
+
+  vars = {
+    cluster_name = aws_ecs_cluster.ecs_cluster.name
+  }
 }
 
 resource "aws_launch_configuration" "ecs_launch_config" {
@@ -11,8 +15,9 @@ resource "aws_launch_configuration" "ecs_launch_config" {
   key_name             = "EFS-TEST"
 }
 
-resource "aws_autoscaling_group" "failure_analysis_ecs_asg" {
-  name                 = "asg"
+resource "aws_autoscaling_group" "asg" {
+  depends_on = [ aws_lb_target_group.target_group ]
+  name                 = "${var.name}-asg"
   vpc_zone_identifier  = var.subnets
   launch_configuration = aws_launch_configuration.ecs_launch_config.name
 
@@ -21,6 +26,7 @@ resource "aws_autoscaling_group" "failure_analysis_ecs_asg" {
   max_size                  = 1
   health_check_grace_period = 300
   health_check_type         = "EC2"
+  target_group_arns = [aws_lb_target_group.target_group.arn]
 
   tag {
     key                 = "AmazonECSManaged"
