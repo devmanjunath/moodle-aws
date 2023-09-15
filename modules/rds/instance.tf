@@ -1,5 +1,4 @@
 resource "aws_rds_cluster_instance" "cluster_instances" {
-  count                = 1
   identifier           = lower("${var.name}-instance")
   cluster_identifier   = aws_rds_cluster.aurora_serverless.id
   engine               = aws_rds_cluster.aurora_serverless.engine

@@ -17,3 +17,7 @@ variable "security_group" {
 variable "container_config" {
   type = any
 }
+
+variable "efs_id" {
+  type = string
+}

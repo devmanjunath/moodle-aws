@@ -5,10 +5,6 @@ resource "aws_ecs_service" "ecs_service" {
   task_definition = aws_ecs_task_definition.task_definition.arn
   desired_count   = 1
   launch_type     = "EC2"
-  network_configuration {
-    subnets         = var.subnets
-    security_groups = var.security_group
-  }
   load_balancer {
     container_name   = "nginx"
     container_port   = "80"

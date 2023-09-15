@@ -34,6 +34,7 @@ module "ecs" {
   vpc_id           = module.network.vpc_id
   container_config = var.container_config
   subnets          = module.network.public_subnets
+  efs_id           = module.efs.efs_id
   security_group = [
     module.network.allow_ssh_sg,
     module.network.allow_nfs_sg,
