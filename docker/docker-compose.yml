@@ -1,0 +1,53 @@
+version: "3.1"
+services:
+  mysqldb:
+    image: mysql:8.0
+    networks:
+    - test-drive-network
+    restart: always
+    container_name: mysqldb
+    environment:
+      MYSQL_DATABASE: "moodle"
+      MYSQL_USER: "admin"
+      MYSQL_PASSWORD: "root"
+      MYSQL_ROOT_PASSWORD: "root"
+    ports:
+    - "3306:3306"
+  phpMyAdmin:
+    depends_on: ["mysqldb"]
+    image: phpmyadmin
+    container_name: pma
+    networks:
+    - test-drive-network
+    restart: always
+    links:
+    - mysqldb
+    ports:
+    - "9000:80"
+    environment:
+      PMA_HOST: mysqldb
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+  test_drive:
+    depends_on: ["mysqldb"]
+    image: test-drive
+    container_name: test
+    restart: always
+    environment:
+      MOODLE_DATABASE_SERVER: mysqldb
+      MOODLE_DATABASE_USERNAME: "admin"
+      MOODLE_DATABASE_PASSWORD: "root" 
+      MOODLE_DATABASE_NAME: "moodle"
+      MOODLE_CACHE_HOST: "cache"
+      MOODLE_HOST: "https://localhost"
+    links:
+    - mysqldb
+    ports:
+    - "80:80"
+    - "443:443"
+    networks:
+    - test-drive-network
+
+networks:
+  test-drive-network:
+    driver: "bridge"

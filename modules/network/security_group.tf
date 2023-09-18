@@ -97,23 +97,15 @@ resource "aws_security_group" "allow_nfs" {
   }
 }
 
-resource "aws_security_group" "allow_ecs_api" {
-  name        = "ecs-api"
-  description = "Allow ECS Traffic"
+resource "aws_security_group" "allow_mysql" {
+  name        = "MYSQL-Access"
+  description = "Allow for MYSQL Connectivity"
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description = "Allow Port 3000"
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Allow Port 443"
-    from_port   = 443
-    to_port     = 443
+    description = "Allow MYSQL"
+    from_port   = 3306
+    to_port     = 3306
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -126,6 +118,31 @@ resource "aws_security_group" "allow_ecs_api" {
   }
 
   tags = {
-    Name = "Allow API"
+    Name = "MYSQL-Access"
+  }
+}
+
+resource "aws_security_group" "allow_memcached" {
+  name        = "Memcached-Access"
+  description = "Allow for Memcached Connectivity"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description = "Allow Memcached"
+    from_port   = 11211
+    to_port     = 11211
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "Memcached-Access"
   }
 }

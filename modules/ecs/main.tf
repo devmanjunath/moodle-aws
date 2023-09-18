@@ -1,8 +1,4 @@
-provider "docker" {
-
-}
-
 resource "aws_ecs_cluster" "ecs_cluster" {
-  # depends_on = [docker_image.moodle_drive]
-  name = "${var.name}-Cluster"
+  depends_on = [aws_ecs_task_definition.task_definition]
+  name       = "${var.name}-Cluster"
 }

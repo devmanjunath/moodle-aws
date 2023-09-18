@@ -1,11 +1,14 @@
+locals {
+  build_file = file("./scripts/build_image.txt")
+}
 data "aws_ecr_repository" "repo" {
   name = lower(var.name)
 }
 
-# resource "docker_image" "moodle_drive" {
-#   name = lower("${var.name}-image")
-#   build {
-#     context    = "${path.cwd}/docker/."
-#     dockerfile = "${path.root}/docker/Dockerfile"
-#   }
-# }
+resource "null_resource" "build_docker_image" {
+  provisioner "local-exec" {
+    working_dir = "./docker"
+    command     = local.build_file
+  }
+
+}

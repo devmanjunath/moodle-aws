@@ -11,9 +11,8 @@ data "template_file" "task_definition" {
 }
 
 resource "aws_ecs_task_definition" "task_definition" {
-  depends_on               = [aws_ecs_cluster_capacity_providers.example]
   family                   = "${var.name}-Definition"
-  requires_compatibilities = ["EC2"]
+  requires_compatibilities = ["FARGATE"]
   network_mode             = "bridge"
   skip_destroy             = true
   container_definitions = jsonencode([{
@@ -26,6 +25,32 @@ resource "aws_ecs_task_definition" "task_definition" {
       }
     ],
     essential = true,
+    environment = [
+      {
+        name  = "MOODLE_DATABASE_SERVER",
+        value = var.container_environments["MOODLE_DATABASE_SERVER"]
+      },
+      {
+        name  = "MOODLE_DATABASE_NAME",
+        value = var.container_environments["MOODLE_DATABASE_NAME"]
+      },
+      {
+        name  = "MOODLE_DATABASE_USERNAME",
+        value = var.container_environments["MOODLE_DATABASE_USERNAME"]
+      },
+      {
+        name  = "MOODLE_DATABASE_PASSWORD",
+        value = var.container_environments["MOODLE_DATABASE_PASSWORD"]
+      },
+      {
+        name  = "MOODLE_HOST",
+        value = var.container_environments["MOODLE_HOST"]
+      },
+      {
+        name  = "MOODLE_CACHE_HOST",
+        value = var.container_environments["MOODLE_CACHE_HOST"]
+      }
+    ]
     mountPoints = [
       {
         containerPath = "/var/www/moodledata",
@@ -37,8 +62,9 @@ resource "aws_ecs_task_definition" "task_definition" {
     logConfiguration = {
       logDriver = "awslogs",
       options = {
-        awslogs-group = aws_cloudwatch_log_group.example.name
-        awslogs-region = "ap-south-2"
+        awslogs-group         = "nginx"
+        awslogs-create-group  = "true"
+        awslogs-region        = "ap-south-2"
         awslogs-stream-prefix = "ecs"
       }
     }
