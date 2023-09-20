@@ -31,4 +31,5 @@ Image to be pasted here soon!!!
 - RDS - Aurora Mysql 8.0 ( Serverless )
 - Elastic-Cache - Memcached
 - ECS - Fargate
-- ACM ( Coming Soon )
+- ACM
+- Route 53

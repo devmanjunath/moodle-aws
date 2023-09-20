@@ -1,7 +1,7 @@
 resource "aws_lb_target_group" "this" {
-  name        = "http-target-group"
-  port        = "80"
-  protocol    = "HTTP"
+  name        = "${var.name}-tg"
+  port        = "443"
+  protocol    = "HTTPS"
   target_type = "ip"
   vpc_id      = var.vpc_id
 
@@ -12,5 +12,9 @@ resource "aws_lb_target_group" "this" {
     protocol            = "HTTP"
     unhealthy_threshold = "10"
     timeout             = "10"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }

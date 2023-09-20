@@ -1,5 +1,6 @@
 
 resource "aws_lb_listener" "http_listener" {
+  depends_on = [ aws_lb_listener.https_listener ]
   load_balancer_arn = aws_lb.this.arn
   port              = "80"
   protocol          = "HTTP"
@@ -15,6 +16,7 @@ resource "aws_lb_listener" "http_listener" {
 }
 
 resource "aws_lb_listener" "https_listener" {
+  depends_on = [ aws_lb_target_group.this ]
   load_balancer_arn = aws_lb.this.arn
   port              = "443"
   protocol          = "HTTPS"

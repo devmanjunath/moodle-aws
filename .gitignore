@@ -34,3 +34,4 @@ override.tf.json
 terraform.rc
 docker/cert.pem
 docker/cert-key.pem
+.terraform.lock.hcl

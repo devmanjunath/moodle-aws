@@ -6,14 +6,14 @@ data "template_file" "task_definition" {
     host_port      = var.container_config["portMappings"][0]["hostPort"]
     container_port = var.container_config["portMappings"][0]["containerPort"]
     name           = var.container_config["name"]
-    image          = data.aws_ecr_repository.repo.repository_url
+    image          = "${aws_ecr_repository.repo.repository_url}:latest"
   }
 }
 
 resource "aws_ecs_task_definition" "task_definition" {
   family                   = "${var.name}-Definition"
   requires_compatibilities = ["FARGATE"]
-  network_mode             = "bridge"
+  network_mode             = "awsvpc"
   skip_destroy             = true
   container_definitions = jsonencode([{
     memory = var.container_config["memory"],
@@ -58,7 +58,7 @@ resource "aws_ecs_task_definition" "task_definition" {
       }
     ],
     name  = var.container_config["name"],
-    image = "480174253711.dkr.ecr.ap-south-2.amazonaws.com/test-drive:latest"
+    image = "${aws_ecr_repository.repo.repository_url}:latest"
     logConfiguration = {
       logDriver = "awslogs",
       options = {
@@ -80,7 +80,7 @@ resource "aws_ecs_task_definition" "task_definition" {
     cpu_architecture        = "X86_64"
   }
   cpu                = 1024
-  memory             = 3000
+  memory             = 3072
   task_role_arn      = "arn:aws:iam::480174253711:role/MoodleTaskExecutionRole"
   execution_role_arn = "arn:aws:iam::480174253711:role/MoodleTaskExecutionRole"
 }
