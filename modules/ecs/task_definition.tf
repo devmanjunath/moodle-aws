@@ -22,6 +22,11 @@ resource "aws_ecs_task_definition" "task_definition" {
         hostPort      = var.container_config["portMappings"][0]["hostPort"]
         containerPort = var.container_config["portMappings"][0]["containerPort"],
         protocol      = "tcp"
+      },
+      {
+        hostPort      = var.container_config["portMappings"][1]["hostPort"]
+        containerPort = var.container_config["portMappings"][1]["containerPort"],
+        protocol      = "tcp"
       }
     ],
     essential = true,
@@ -71,6 +76,7 @@ resource "aws_ecs_task_definition" "task_definition" {
   }])
   volume {
     name = "efs-Test"
+
     efs_volume_configuration {
       file_system_id = var.efs_id
     }

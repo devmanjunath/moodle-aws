@@ -4,11 +4,12 @@ locals {
 }
 
 resource "aws_ecr_repository" "repo" {
-  name = lower(var.name)
+  name         = lower(var.name)
+  force_delete = true
 }
 
 resource "null_resource" "build_docker_image" {
-  depends_on = [ aws_ecr_repository.repo ]
+  depends_on = [aws_ecr_repository.repo]
   triggers = {
     always_run = timestamp()
   }

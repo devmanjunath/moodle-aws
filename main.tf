@@ -53,21 +53,21 @@ module "efs" {
 }
 
 module "rds" {
-  depends_on = [ module.network ]
-  source  = "./modules/rds"
-  name    = var.project
-  vpc_id  = module.network.vpc_id
-  subnets = module.network.public_subnets
+  depends_on = [module.network]
+  source     = "./modules/rds"
+  name       = var.project
+  vpc_id     = module.network.vpc_id
+  subnets    = module.network.public_subnets
   security_group = [
     module.network.allow_mysql,
   ]
 }
 
 module "cache" {
-  depends_on = [ module.network ]
-  source  = "./modules/cache"
-  name    = var.project
-  subnets = module.network.public_subnets
+  depends_on = [module.network]
+  source     = "./modules/cache"
+  name       = var.project
+  subnets    = module.network.public_subnets
   security_group = [
     module.network.allow_memcached,
   ]
@@ -83,11 +83,11 @@ module "ecs" {
   target_group_arn = module.load_balancer.target_group_arn
   container_environments = {
     MOODLE_HOST              = "https://cloudbreathe.in"
-    MOODLE_CACHE_HOST        = "module.cache.cache_endpoint"
+    MOODLE_CACHE_HOST        = module.cache.cache_endpoint
     MOODLE_DATABASE_NAME     = "moodle"
-    MOODLE_DATABASE_PASSWORD = ""
-    MOODLE_DATABASE_SERVER   = "module.rds.db_endpoint"
-    MOODLE_DATABASE_USERNAME = "module.rds.db_username"
+    MOODLE_DATABASE_PASSWORD = module.rds.db_password
+    MOODLE_DATABASE_SERVER   = module.rds.db_endpoint
+    MOODLE_DATABASE_USERNAME = module.rds.db_username
   }
   subnets = module.network.public_subnets
   efs_id  = module.efs.efs_id
