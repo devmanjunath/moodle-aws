@@ -26,6 +26,14 @@ variable "efs_id" {
   type = string
 }
 
+variable "efs_arn" {
+  type = string
+}
+
+variable "efs_access_point_arn" {
+  type = string
+}
+
 variable "target_group_arn" {
   type = string
 }

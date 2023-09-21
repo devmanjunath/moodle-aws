@@ -1,3 +1,13 @@
+provider "aws" {
+  region = var.region
+  default_tags {
+    tags = {
+      terraform = true
+      project   = var.project
+    }
+  }
+}
+
 locals {
   public_subnets = {
     "ap-south-2a" : "10.0.1.0/24",

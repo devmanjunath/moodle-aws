@@ -1,35 +1,12 @@
-data "template_file" "task_definition" {
-  template = file("${path.module}/task_definition.tpl")
-
-  vars = {
-    memory         = var.container_config["memory"]
-    host_port      = var.container_config["portMappings"][0]["hostPort"]
-    container_port = var.container_config["portMappings"][0]["containerPort"]
-    name           = var.container_config["name"]
-    image          = "${aws_ecr_repository.repo.repository_url}:latest"
-  }
-}
-
 resource "aws_ecs_task_definition" "task_definition" {
   family                   = "${var.name}-Definition"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   skip_destroy             = true
   container_definitions = jsonencode([{
-    memory = var.container_config["memory"],
-    portMappings = [
-      {
-        hostPort      = var.container_config["portMappings"][0]["hostPort"]
-        containerPort = var.container_config["portMappings"][0]["containerPort"],
-        protocol      = "tcp"
-      },
-      {
-        hostPort      = var.container_config["portMappings"][1]["hostPort"]
-        containerPort = var.container_config["portMappings"][1]["containerPort"],
-        protocol      = "tcp"
-      }
-    ],
-    essential = true,
+    memory       = var.container_config["memory"],
+    portMappings = var.container_config["portMappings"]
+    essential    = true,
     environment = [
       {
         name  = "MOODLE_DATABASE_SERVER",
@@ -59,7 +36,7 @@ resource "aws_ecs_task_definition" "task_definition" {
     mountPoints = [
       {
         containerPath = "/var/www/moodledata",
-        sourceVolume  = "efs-Test"
+        sourceVolume  = "${var.name}-volume"
       }
     ],
     name  = var.container_config["name"],
@@ -67,7 +44,7 @@ resource "aws_ecs_task_definition" "task_definition" {
     logConfiguration = {
       logDriver = "awslogs",
       options = {
-        awslogs-group         = "nginx"
+        awslogs-group         = "${var.name}"
         awslogs-create-group  = "true"
         awslogs-region        = "ap-south-2"
         awslogs-stream-prefix = "ecs"
@@ -75,7 +52,7 @@ resource "aws_ecs_task_definition" "task_definition" {
     }
   }])
   volume {
-    name = "efs-Test"
+    name = "${var.name}-volume"
 
     efs_volume_configuration {
       file_system_id = var.efs_id
@@ -87,6 +64,6 @@ resource "aws_ecs_task_definition" "task_definition" {
   }
   cpu                = 1024
   memory             = 3072
-  task_role_arn      = "arn:aws:iam::480174253711:role/MoodleTaskExecutionRole"
-  execution_role_arn = "arn:aws:iam::480174253711:role/MoodleTaskExecutionRole"
+  task_role_arn      = aws_iam_role.this.arn
+  execution_role_arn = aws_iam_role.this.arn
 }
