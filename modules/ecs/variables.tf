@@ -38,6 +38,10 @@ variable "target_group_arn" {
   type = string
 }
 
+variable "efs_access_point_id" {
+  type = string
+}
+
 variable "container_environments" {
   type = object({
     MOODLE_HOST              = string

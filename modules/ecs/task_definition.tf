@@ -55,7 +55,13 @@ resource "aws_ecs_task_definition" "task_definition" {
     name = "${var.name}-volume"
 
     efs_volume_configuration {
+      transit_encryption = "ENABLED"
       file_system_id = var.efs_id
+      authorization_config {
+        iam = "ENABLED"
+        access_point_id = var.efs_access_point_id
+
+      }
     }
   }
   runtime_platform {

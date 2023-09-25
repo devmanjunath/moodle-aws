@@ -8,7 +8,7 @@ resource "aws_iam_role" "this" {
         Action = "sts:AssumeRole"
         Effect = "Allow"
         Principal = {
-          Service = "ecs.amazonaws.com"
+          Service = "ecs-tasks.amazonaws.com"
         }
       },
     ]
@@ -31,7 +31,13 @@ data "aws_iam_policy_document" "efs-access-policy" {
       "elasticfilesystem:ClientRootAccess"
     ]
 
-    resources = [var]
+    resources = [var.efs_arn]
+
+    condition {
+      test = "StringEquals"
+      variable = "elasticfilesystem:AccessPointArn"
+      values = [var.efs_access_point_arn]
+    }
 
     condition {
       test     = "Bool"
@@ -44,7 +50,7 @@ data "aws_iam_policy_document" "efs-access-policy" {
 resource "aws_iam_policy_attachment" "service_role" {
   name       = "ecs-service-role-attachment"
   roles      = [aws_iam_role.this.name]
-  policy_arn = "arn:aws:iam::aws:policy/aws-service-role/AmazonECSServiceRolePolicy"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
 }
 
 resource "aws_iam_policy_attachment" "execution_role" {
