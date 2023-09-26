@@ -34,15 +34,9 @@ data "aws_iam_policy_document" "efs-access-policy" {
     resources = [var.efs_arn]
 
     condition {
-      test = "StringEquals"
+      test     = "StringEquals"
       variable = "elasticfilesystem:AccessPointArn"
-      values = [var.efs_access_point_arn]
-    }
-
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values   = ["true"]
+      values   = [var.efs_access_point_arn]
     }
   }
 }

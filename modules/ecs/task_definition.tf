@@ -1,4 +1,5 @@
 resource "aws_ecs_task_definition" "task_definition" {
+  depends_on               = [null_resource.build_docker_image]
   family                   = "${var.name}-Definition"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
@@ -56,9 +57,9 @@ resource "aws_ecs_task_definition" "task_definition" {
 
     efs_volume_configuration {
       transit_encryption = "ENABLED"
-      file_system_id = var.efs_id
+      file_system_id     = var.efs_id
       authorization_config {
-        iam = "ENABLED"
+        iam             = "ENABLED"
         access_point_id = var.efs_access_point_id
 
       }

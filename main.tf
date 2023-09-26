@@ -35,7 +35,7 @@ module "acm" {
 }
 
 module "load_balancer" {
-  depends_on      = [module.network]
+  depends_on      = [module.network, module.acm]
   source          = "./modules/load_balancer"
   name            = var.project
   acm_arn         = module.acm.acm_arn
