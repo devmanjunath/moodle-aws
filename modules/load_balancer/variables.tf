@@ -17,3 +17,11 @@ variable "subnets" {
 variable "security_groups" {
   type = list(string)
 }
+
+variable "domain_name" {
+  type = string
+}
+
+variable "zone_id" {
+  type = string
+}

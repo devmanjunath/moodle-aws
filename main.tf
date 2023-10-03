@@ -34,24 +34,24 @@ module "acm" {
   domain_name = "cloudbreathe.in"
 }
 
+module "route53" {
+  depends_on                = [module.acm]
+  source                    = "./modules/route53"
+  domain_name               = "cloudbreathe.in"
+  acm_arn                   = module.acm.acm_arn
+  domain_validation_options = module.acm.domain_validation_options
+}
+
 module "load_balancer" {
   depends_on      = [module.network, module.acm]
   source          = "./modules/load_balancer"
   name            = var.project
+  domain_name     = "cloudbreathe.in"
+  zone_id         = module.route53.zone_id
   acm_arn         = module.acm.acm_arn
   vpc_id          = module.network.vpc_id
   security_groups = [module.network.allow_web_sg]
   subnets         = module.network.public_subnets
-}
-
-module "route53" {
-  depends_on                = [module.load_balancer]
-  source                    = "./modules/route53"
-  domain_name               = "cloudbreathe.in"
-  acm_arn                   = module.acm.acm_arn
-  dns_name                  = module.load_balancer.dns_name
-  zone_id                   = module.load_balancer.zone_id
-  domain_validation_options = module.acm.domain_validation_options
 }
 
 module "efs" {
