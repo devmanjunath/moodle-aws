@@ -7,7 +7,7 @@ resource "aws_ecs_task_definition" "task_definition" {
   container_definitions = jsonencode([{
     memory       = var.container_config["memory"],
     portMappings = var.container_config["portMappings"]
-    essential    = true,
+    essential    = true
     environment = [
       {
         name  = "MOODLE_DATABASE_SERVER",
@@ -36,7 +36,7 @@ resource "aws_ecs_task_definition" "task_definition" {
     ]
     mountPoints = [
       {
-        containerPath = "/var/www/moodledata",
+        containerPath = "/var/www/html/moodledata",
         sourceVolume  = "${var.name}-volume"
       }
     ],

@@ -10,9 +10,9 @@ resource "aws_efs_access_point" "this" {
     creation_info {
       owner_uid   = 1000
       owner_gid   = 1000
-      permissions = 755
+      permissions = 777
     }
-    path = "/"
+    path = "/mdata"
   }
 
   tags = {

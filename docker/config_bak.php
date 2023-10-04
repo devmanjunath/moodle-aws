@@ -4,7 +4,7 @@ unset($CFG);
 global $CFG;
 $CFG = new stdClass();
 
-$CFG->dbtype    = 'mysqli';
+$CFG->dbtype    = "auroramysql";
 $CFG->dblibrary = 'native';
 $CFG->dbhost    = getenv('MOODLE_DATABASE_SERVER');
 $CFG->dbname    = getenv('MOODLE_DATABASE_NAME');
@@ -20,7 +20,7 @@ $CFG->dboptions = array (
 
 $CFG->getremoteaddrconf = 0;
 $CFG->wwwroot   = getenv('MOODLE_HOST');
-$CFG->dataroot  = '/var/www/moodledata';
+$CFG->dataroot  = '/var/www/html/moodledata';
 $CFG->admin     = 'admin';
 
 $CFG->directorypermissions = 0777;

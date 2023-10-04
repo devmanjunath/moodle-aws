@@ -37,11 +37,11 @@ RUN git branch --track MOODLE_402_STABLE origin/MOODLE_402_STABLE
 
 RUN git checkout MOODLE_402_STABLE
 
-RUN mkdir /var/www/moodledata
+RUN mkdir /var/www/html/moodledata
 
-RUN chown -R www-data /var/www/moodledata
+RUN chown -R www-data /var/www/html/moodledata
 
-RUN chmod -R 777 /var/www/moodledata
+RUN chmod -R 777 /var/www/html/moodledata
 
 RUN chmod -R 777 /var/www/html
 
