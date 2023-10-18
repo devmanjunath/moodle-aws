@@ -12,6 +12,7 @@ resource "aws_rds_cluster" "aurora_serverless" {
   vpc_security_group_ids = var.security_group
   db_subnet_group_name   = aws_db_subnet_group.default.id
   skip_final_snapshot    = true
+  database_name          = "moodle"
 
   serverlessv2_scaling_configuration {
     max_capacity = 1.0

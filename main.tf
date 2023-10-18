@@ -73,18 +73,18 @@ module "rds" {
   ]
 }
 
-module "cache" {
-  depends_on = [module.network]
-  source     = "./modules/cache"
-  name       = var.project
-  subnets    = module.network.public_subnets
-  security_group = [
-    module.network.allow_memcached,
-  ]
-}
+# module "cache" {
+#   depends_on = [module.network]
+#   source     = "./modules/cache"
+#   name       = var.project
+#   subnets    = module.network.public_subnets
+#   security_group = [
+#     module.network.allow_memcached,
+#   ]
+# }
 
 module "ecs" {
-  depends_on           = [module.network, module.efs, module.rds, module.cache, module.load_balancer]
+  depends_on           = [module.network, module.efs, module.rds, module.load_balancer]
   source               = "./modules/ecs"
   name                 = var.project
   region               = var.region
@@ -94,14 +94,47 @@ module "ecs" {
   efs_access_point_arn = module.efs.access_point_arn
   efs_access_point_id  = module.efs.access_point_id
   target_group_arn     = module.load_balancer.target_group_arn
-  container_environments = {
-    MOODLE_HOST              = "https://cloudbreathe.in"
-    MOODLE_CACHE_HOST        = module.cache.cache_endpoint
-    MOODLE_DATABASE_NAME     = "moodle"
-    MOODLE_DATABASE_PASSWORD = module.rds.db_password
-    MOODLE_DATABASE_SERVER   = module.rds.db_endpoint
-    MOODLE_DATABASE_USERNAME = module.rds.db_username
-  }
+  container_environments = [
+    {
+      name  = "BITNAMI_DEBUG"
+      value = true
+    },
+    {
+      name  = "MOODLE_DATABASE_TYPE"
+      value = "auroramysql"
+    },
+    {
+      name  = "MOODLE_SKIP_BOOTSTRAP"
+      value = "yes"
+    },
+    {
+      name  = "MOODLE_SSLPROXY"
+      value = "yes"
+    },
+    {
+      name  = "MOODLE_HOST"
+      value = "cloudbreathe.in"
+    },
+    {
+      name  = "MOODLE_CACHE_HOST"
+      value = "module.cache.cache_endpoint"
+    },
+    {
+      name  = "MOODLE_DATABASE_NAME"
+      value = "moodle"
+    },
+    {
+      name  = "MOODLE_DATABASE_PASSWORD"
+      value = module.rds.db_password
+    },
+    {
+      name  = "MOODLE_DATABASE_HOST"
+      value = module.rds.db_endpoint
+    },
+    {
+      name  = "MOODLE_DATABASE_USER"
+      value = module.rds.db_username
+  }]
   subnets = module.network.public_subnets
   efs_id  = module.efs.efs_id
   security_group = [
