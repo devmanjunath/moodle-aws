@@ -45,7 +45,7 @@ resource "aws_security_group" "allow_web" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description = "Allow Port 80"
+    description = "Allow Port 8080"
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
@@ -56,6 +56,22 @@ resource "aws_security_group" "allow_web" {
     description = "Allow Port 8443"
     from_port   = 8443
     to_port     = 8443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Allow Port 80"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Allow Port 443"
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

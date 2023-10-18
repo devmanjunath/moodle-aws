@@ -1,6 +1,6 @@
 resource "aws_lb_target_group" "this" {
   name             = "${var.name}-tg"
-  port             = "443"
+  port             = "8443"
   protocol         = "HTTPS"
   target_type      = "ip"
   vpc_id           = var.vpc_id
