@@ -10,14 +10,14 @@ provider "aws" {
 
 locals {
   public_subnets = {
-    "ap-south-2a" : "10.0.1.0/24",
-    "ap-south-2b" : "10.0.2.0/24",
-    "ap-south-2c" : "10.0.3.0/24"
+    "${var.region}a" : "10.0.1.0/24",
+    "${var.region}b" : "10.0.2.0/24",
+    "${var.region}c" : "10.0.3.0/24"
   }
   private_subnets = {
-    "ap-south-2a" : "10.0.4.0/24",
-    "ap-south-2b" : "10.0.5.0/24",
-    "ap-south-2c" : "10.0.6.0/24"
+    "${var.region}a" : "10.0.4.0/24",
+    "${var.region}b" : "10.0.5.0/24",
+    "${var.region}c" : "10.0.6.0/24"
   }
 }
 
@@ -94,35 +94,7 @@ module "ecs" {
   efs_access_point_arn = module.efs.access_point_arn
   efs_access_point_id  = module.efs.access_point_id
   target_group_arn     = module.load_balancer.target_group_arn
-  container_environments = [
-    {
-      name  = "BITNAMI_DEBUG"
-      value = true
-    },
-    {
-      name  = "MOODLE_DATABASE_TYPE"
-      value = "auroramysql"
-    },
-    {
-      name  = "MOODLE_SKIP_BOOTSTRAP"
-      value = "yes"
-    },
-    {
-      name  = "MOODLE_SSLPROXY"
-      value = "yes"
-    },
-    {
-      name  = "MOODLE_HOST"
-      value = "cloudbreathe.in"
-    },
-    {
-      name  = "MOODLE_CACHE_HOST"
-      value = "module.cache.cache_endpoint"
-    },
-    {
-      name  = "MOODLE_DATABASE_NAME"
-      value = "moodle"
-    },
+  container_environments = concat(var.container_environment, [
     {
       name  = "MOODLE_DATABASE_PASSWORD"
       value = module.rds.db_password
@@ -134,7 +106,8 @@ module "ecs" {
     {
       name  = "MOODLE_DATABASE_USER"
       value = module.rds.db_username
-  }]
+    }
+  ])
   subnets = module.network.public_subnets
   efs_id  = module.efs.efs_id
   security_group = [

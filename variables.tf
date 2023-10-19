@@ -1,6 +1,5 @@
 variable "region" {
-  type    = string
-  default = "ap-south-2"
+  type = string
 }
 
 variable "project" {
@@ -19,4 +18,11 @@ variable "container_config" {
       hostPort      = number
     }))
   })
+}
+
+variable "container_environment" {
+  type = list(object({
+    name  = string
+    value = string
+  }))
 }

@@ -5,7 +5,7 @@ resource "aws_ecs_task_definition" "task_definition" {
   network_mode             = "awsvpc"
   skip_destroy             = true
   container_definitions = jsonencode([{
-    memory       = var.container_config["memory"],
+    memory       = var.container_config["memory"]
     cpu          = var.container_config["cpu"]
     portMappings = var.container_config["portMappings"]
     essential    = true
@@ -46,8 +46,8 @@ resource "aws_ecs_task_definition" "task_definition" {
     operating_system_family = "LINUX"
     cpu_architecture        = "X86_64"
   }
-  cpu                = 2048
-  memory             = 4096
+  cpu                = var.container_config["cpu"]
+  memory             = var.container_config["memory"]
   task_role_arn      = aws_iam_role.this.arn
   execution_role_arn = aws_iam_role.this.arn
 }
