@@ -24,7 +24,7 @@ resource "aws_ecs_task_definition" "task_definition" {
       options = {
         awslogs-group         = "${var.name}"
         awslogs-create-group  = "true"
-        awslogs-region        = "ap-south-2"
+        awslogs-region        = "ap-south-1"
         awslogs-stream-prefix = "ecs"
       }
     }

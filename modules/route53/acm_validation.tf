@@ -5,7 +5,4 @@ resource "aws_acm_certificate_validation" "domain_validation" {
   timeouts {
     create = "120m"
   }
-  lifecycle {
-    prevent_destroy = true
-  }
 }

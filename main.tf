@@ -116,3 +116,9 @@ module "ecs" {
     module.network.allow_web_sg,
   ]
 }
+
+module "asg" {
+  source       = "./modules/asg"
+  cluster_name = module.ecs.cluster_name
+  service_name = module.ecs.service_name
+}
