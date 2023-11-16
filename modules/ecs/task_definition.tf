@@ -10,12 +10,12 @@ resource "aws_ecs_task_definition" "task_definition" {
     portMappings = var.container_config["portMappings"]
     essential    = true
     environment  = var.container_environments
-    # mountPoints = [
-    #   {
-    #     containerPath = "/var/www/html/moodledata",
-    #     sourceVolume  = "${var.name}-volume"
-    #   }
-    # ],
+    mountPoints = [
+      {
+        containerPath = "/bitnami/moodledata",
+        sourceVolume  = "${var.name}-volume"
+      }
+    ],
     name = var.container_config["name"],
     # image = "${aws_ecr_repository.repo.repository_url}:latest"
     image = "bitnami/moodle:latest"
@@ -29,19 +29,18 @@ resource "aws_ecs_task_definition" "task_definition" {
       }
     }
   }])
-  # volume {
-  #   name = "${var.name}-volume"
+  volume {
+    name = "${var.name}-volume"
 
-  #   efs_volume_configuration {
-  #     transit_encryption = "ENABLED"
-  #     file_system_id     = var.efs_id
-  #     authorization_config {
-  #       iam             = "ENABLED"
-  #       access_point_id = var.efs_access_point_id
-
-  #     }
-  #   }
-  # }
+    efs_volume_configuration {
+      transit_encryption = "ENABLED"
+      file_system_id     = var.efs_id
+      authorization_config {
+        iam             = "ENABLED"
+        access_point_id = var.efs_access_point_id
+      }
+    }
+  }
   runtime_platform {
     operating_system_family = "LINUX"
     cpu_architecture        = "X86_64"
