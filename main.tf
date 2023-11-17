@@ -118,6 +118,7 @@ module "ecs" {
 }
 
 module "asg" {
+  depends_on   = [module.ecs]
   source       = "./modules/asg"
   cluster_name = module.ecs.cluster_name
   service_name = module.ecs.service_name
