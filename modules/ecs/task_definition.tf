@@ -1,5 +1,5 @@
 resource "aws_ecs_task_definition" "task_definition" {
-  # depends_on               = [null_resource.build_docker_image]
+  depends_on               = [null_resource.build_docker_image]
   family                   = "${var.name}-Definition"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
@@ -16,9 +16,8 @@ resource "aws_ecs_task_definition" "task_definition" {
         sourceVolume  = "${var.name}-volume"
       }
     ],
-    name = var.container_config["name"],
-    # image = "${aws_ecr_repository.repo.repository_url}:latest"
-    image = "bitnami/moodle:latest"
+    name  = var.container_config["name"],
+    image = "${aws_ecr_repository.repo.repository_url}:latest"
     logConfiguration = {
       logDriver = "awslogs",
       options = {

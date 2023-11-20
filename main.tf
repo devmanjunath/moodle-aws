@@ -54,12 +54,10 @@ module "load_balancer" {
   subnets         = module.network.public_subnets
 }
 
-module "efs" {
-  depends_on       = [module.network]
-  source           = "./modules/efs"
-  name             = var.project
-  subnets_to_mount = module.network.public_subnets
-  security_group   = [module.network.allow_nfs_sg]
+module "ses" {
+  source = "./modules/ses"
+  name   = var.project
+  email  = "manjunathpv@outlook.com"
 }
 
 module "rds" {
@@ -73,18 +71,26 @@ module "rds" {
   ]
 }
 
-# module "cache" {
-#   depends_on = [module.network]
-#   source     = "./modules/cache"
-#   name       = var.project
-#   subnets    = module.network.public_subnets
-#   security_group = [
-#     module.network.allow_memcached,
-#   ]
-# }
+module "cache" {
+  depends_on = [module.network, module.rds]
+  source     = "./modules/cache"
+  name       = var.project
+  subnets    = module.network.public_subnets
+  security_group = [
+    module.network.allow_redis,
+  ]
+}
+
+module "efs" {
+  depends_on       = [module.network, module.rds]
+  source           = "./modules/efs"
+  name             = var.project
+  subnets_to_mount = module.network.public_subnets
+  security_group   = [module.network.allow_nfs_sg]
+}
 
 module "ecs" {
-  depends_on           = [module.network, module.efs, module.rds, module.load_balancer]
+  depends_on           = [module.network, module.ses, module.efs, module.rds, module.cache, module.load_balancer]
   source               = "./modules/ecs"
   name                 = var.project
   region               = var.region
@@ -106,6 +112,22 @@ module "ecs" {
     {
       name  = "MOODLE_DATABASE_USER"
       value = module.rds.db_username
+    },
+    {
+      name  = "MOODLE_SMTP_HOST"
+      value = "email-smtp.${var.region}.amazonaws.com"
+    },
+    {
+      name  = "MOODLE_SMTP_PORT"
+      value = "587"
+    },
+    {
+      name  = "MOODLE_SMTP_USER"
+      value = "manjunathpv@outlook.com"
+    },
+    {
+      name  = "MOODLE_SMTP_PASSWORD"
+      value = module.ses.smtp_password
     }
   ])
   subnets = module.network.public_subnets

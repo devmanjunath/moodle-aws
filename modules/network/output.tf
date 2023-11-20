@@ -26,6 +26,6 @@ output "allow_mysql" {
   value = aws_security_group.allow_mysql.id
 }
 
-output "allow_memcached" {
-  value = aws_security_group.allow_memcached.id
+output "allow_redis" {
+  value = aws_security_group.allow_redis.id
 }

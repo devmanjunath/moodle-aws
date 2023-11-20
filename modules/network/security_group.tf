@@ -138,15 +138,15 @@ resource "aws_security_group" "allow_mysql" {
   }
 }
 
-resource "aws_security_group" "allow_memcached" {
-  name        = "Memcached-Access"
-  description = "Allow for Memcached Connectivity"
+resource "aws_security_group" "allow_redis" {
+  name        = "Redis-Access"
+  description = "Allow for Redis Connectivity"
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description = "Allow Memcached"
-    from_port   = 11211
-    to_port     = 11211
+    description = "Allow Redis"
+    from_port   = 6379
+    to_port     = 6379
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

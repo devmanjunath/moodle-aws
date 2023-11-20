@@ -6,9 +6,8 @@ output "db_username" {
   value = module.rds.db_username
 }
 
-output "db_password" {
-  value     = module.rds.db_password
-  sensitive = true
+output "cache_endpoint" {
+  value = module.cache.cache_endpoint
 }
 
 output "lb_dns_name" {
