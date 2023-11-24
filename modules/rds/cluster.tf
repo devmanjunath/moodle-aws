@@ -12,7 +12,7 @@ resource "aws_rds_cluster" "aurora_serverless" {
   vpc_security_group_ids    = var.security_group
   db_subnet_group_name      = aws_db_subnet_group.default.id
   final_snapshot_identifier = "${var.name}-snapshot-${formatdate("YYYYMMDDhhmmss", timestamp())}"
-  snapshot_identifier       = try(data.aws_db_snapshot.latest_snapshot.0.id, null)
+  snapshot_identifier       = try(data.aws_db_cluster_snapshot.latest_snapshot.0.id, null)
   skip_final_snapshot       = false
   database_name             = "moodle"
 

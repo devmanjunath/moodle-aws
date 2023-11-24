@@ -9,7 +9,12 @@ resource "aws_ecs_task_definition" "task_definition" {
     cpu          = var.container_config["cpu"]
     portMappings = var.container_config["portMappings"]
     essential    = true
-    environment  = var.container_environments
+    environment = [
+      for key, value in var.container_environments : {
+        name  = key
+        value = value
+      }
+    ]
     mountPoints = [
       {
         containerPath = "/bitnami/moodledata",

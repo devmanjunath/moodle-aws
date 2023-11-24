@@ -21,8 +21,5 @@ variable "container_config" {
 }
 
 variable "container_environment" {
-  type = list(object({
-    name  = string
-    value = string
-  }))
+  type = map(string)
 }

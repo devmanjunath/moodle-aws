@@ -100,36 +100,16 @@ module "ecs" {
   efs_access_point_arn = module.efs.access_point_arn
   efs_access_point_id  = module.efs.access_point_id
   target_group_arn     = module.load_balancer.target_group_arn
-  container_environments = concat(var.container_environment, [
+  container_environments = merge(var.container_environment,
     {
-      name  = "MOODLE_DATABASE_PASSWORD"
-      value = module.rds.db_password
-    },
-    {
-      name  = "MOODLE_DATABASE_HOST"
-      value = module.rds.db_endpoint
-    },
-    {
-      name  = "MOODLE_DATABASE_USER"
-      value = module.rds.db_username
-    },
-    {
-      name  = "MOODLE_SMTP_HOST"
-      value = "email-smtp.${var.region}.amazonaws.com"
-    },
-    {
-      name  = "MOODLE_SMTP_PORT"
-      value = "587"
-    },
-    {
-      name  = "MOODLE_SMTP_USER"
-      value = "manjunathpv@outlook.com"
-    },
-    {
-      name  = "MOODLE_SMTP_PASSWORD"
-      value = module.ses.smtp_password
-    }
-  ])
+      "MOODLE_DATABASE_PASSWORD" = module.rds.db_password
+      "MOODLE_DATABASE_HOST"     = module.rds.db_endpoint
+      "MOODLE_DATABASE_USER"     = module.rds.db_username
+      "MOODLE_SKIP_BOOTSTRAP"    = module.rds.db_snapshot_exists ? "yes" : "no"
+      "MOODLE_SMTP_HOST"         = "email-smtp.${var.region}.amazonaws.com"
+      "MOODLE_SMTP_PORT"         = "25"
+      "MOODLE_SMTP_PASSWORD"     = module.ses.smtp_password
+  })
   subnets = module.network.public_subnets
   efs_id  = module.efs.efs_id
   security_group = [

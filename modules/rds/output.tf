@@ -10,3 +10,7 @@ output "db_password" {
   value     = aws_rds_cluster.aurora_serverless.master_password
   sensitive = true
 }
+
+output "db_snapshot_exists" {
+  value = data.external.rds_final_snapshot_exists.result.db_exists
+}

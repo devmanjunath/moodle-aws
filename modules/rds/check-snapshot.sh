@@ -7,10 +7,12 @@ if [ -z ${db_id} ]; then
   exit 1
 fi
 
-RESULT=($(aws rds describe-db-snapshots --db-instance-identifier $db_id --output text 2> /dev/null))
+eval "$(jq -r '@sh "region=\(.region)"')"
+
+RESULT=($(aws rds describe-db-cluster-snapshots --db-cluster-identifier $db_id --region=$region --output text 2> /dev/null))
 aws_result=$?
 
-if [ ${aws_result} -eq 0 ] && [[ ${RESULT[0]} == "DBSNAPSHOTS" ]]; then
+if [ ${aws_result} -eq 0 ] && [[ ${RESULT[0]} == "DBCLUSTERSNAPSHOTS" ]]; then
   result='true'
 else
   result='false'

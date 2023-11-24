@@ -1,13 +1,16 @@
 data "external" "rds_final_snapshot_exists" {
   program = [
-    "./check-snapshot.sh",
-    "db-instance-${terraform.workspace}"
+    "${path.module}/check-snapshot.sh",
+    "${var.name}-db"
   ]
+  query = {
+    region = var.region
+  }
 }
 
 
-data "aws_db_snapshot" "latest_snapshot" {
-  count                  = data.external.rds_final_snapshot_exists.result.db_exists ? 1 : 0
-  db_instance_identifier = "db-instance-id"
-  most_recent            = true
+data "aws_db_cluster_snapshot" "latest_snapshot" {
+  count                 = data.external.rds_final_snapshot_exists.result.db_exists ? 1 : 0
+  db_cluster_identifier = "${var.name}-db"
+  most_recent           = true
 }
