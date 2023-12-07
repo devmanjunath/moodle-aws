@@ -4,6 +4,7 @@ locals {
 }
 
 resource "aws_ecr_repository" "repo" {
+  depends_on   = [module.triggers]
   name         = lower(var.name)
   force_delete = true
 }

@@ -17,7 +17,8 @@ resource "aws_cloudwatch_event_rule" "this" {
 }
 
 resource "aws_cloudwatch_event_target" "this" {
-  rule      = aws_cloudwatch_event_rule.this.name
-  target_id = "SendToLambda"
-  arn       = module.ecs_lambda.lambda_function_arn
+  rule           = aws_cloudwatch_event_rule.this.name
+  event_bus_name = aws_cloudwatch_event_bus.this.name
+  target_id      = "SendToLambda"
+  arn            = module.ecs_lambda.lambda_function_arn
 }

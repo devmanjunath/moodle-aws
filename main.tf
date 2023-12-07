@@ -132,9 +132,3 @@ module "ecs" {
     module.network.allow_web_sg,
   ]
 }
-
-module "triggers" {
-  source = "./modules/triggers"
-  name = var.project
-  cluster_arn = module.ecs.cluster_arn
-}
