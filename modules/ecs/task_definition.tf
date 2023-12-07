@@ -1,12 +1,10 @@
 resource "aws_ecs_task_definition" "task_definition" {
   depends_on               = [null_resource.build_docker_image]
   family                   = "${var.name}-Definition"
-  requires_compatibilities = ["FARGATE"]
+  requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
   skip_destroy             = true
   container_definitions = jsonencode([{
-    memory       = var.container_config["memory"]
-    cpu          = var.container_config["cpu"]
     portMappings = var.container_config["portMappings"]
     essential    = true
     environment = [
@@ -44,10 +42,6 @@ resource "aws_ecs_task_definition" "task_definition" {
         access_point_id = var.efs_access_point_id
       }
     }
-  }
-  runtime_platform {
-    operating_system_family = "LINUX"
-    cpu_architecture        = "X86_64"
   }
   cpu                = var.container_config["cpu"]
   memory             = var.container_config["memory"]

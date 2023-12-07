@@ -72,7 +72,7 @@ module "rds" {
 }
 
 module "cache" {
-  depends_on = [module.network, module.rds]
+  depends_on = [module.network]
   source     = "./modules/cache"
   name       = var.project
   subnets    = module.network.public_subnets
@@ -82,15 +82,28 @@ module "cache" {
 }
 
 module "efs" {
-  depends_on       = [module.network, module.rds]
+  depends_on       = [module.network]
   source           = "./modules/efs"
   name             = var.project
   subnets_to_mount = module.network.public_subnets
   security_group   = [module.network.allow_nfs_sg]
 }
 
+module "asg" {
+  depends_on = [module.network]
+  source     = "./modules/asg"
+  name       = var.project
+  key_pair   = "MoodleManual"
+  security_group = [
+    module.network.allow_ssh_sg,
+    module.network.allow_nfs_sg,
+    module.network.allow_web_sg,
+  ]
+  subnets = module.network.public_subnets
+}
+
 module "ecs" {
-  depends_on           = [module.network, module.ses, module.efs, module.rds, module.cache, module.load_balancer]
+  depends_on           = [module.network, module.ses, module.efs, module.rds, module.cache, module.load_balancer, module.asg]
   source               = "./modules/ecs"
   name                 = var.project
   region               = var.region
@@ -100,6 +113,7 @@ module "ecs" {
   efs_access_point_arn = module.efs.access_point_arn
   efs_access_point_id  = module.efs.access_point_id
   target_group_arn     = module.load_balancer.target_group_arn
+  asg_arn              = module.asg.autoscaling_group_arn
   container_environments = merge(var.container_environment,
     {
       "MOODLE_DATABASE_PASSWORD" = module.rds.db_password
@@ -119,9 +133,8 @@ module "ecs" {
   ]
 }
 
-module "asg" {
-  depends_on   = [module.ecs]
-  source       = "./modules/asg"
-  cluster_name = module.ecs.cluster_name
-  service_name = module.ecs.service_name
+module "triggers" {
+  source = "./modules/triggers"
+  name = var.project
+  cluster_arn = module.ecs.cluster_arn
 }

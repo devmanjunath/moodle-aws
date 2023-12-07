@@ -42,6 +42,10 @@ variable "efs_access_point_id" {
   type = string
 }
 
+variable "asg_arn" {
+  type = string
+}
+
 variable "container_environments" {
   type = map(string)
   # List of variables required
