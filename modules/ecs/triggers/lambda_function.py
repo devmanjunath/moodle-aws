@@ -1,7 +1,7 @@
 import boto3
 import os
 
-def update_ecs_service(cluster_name, service_name, new_environment_variables):
+def update_ecs_service(cluster_name, service_name):
     ecs_client = boto3.client("ecs")
 
     response = ecs_client.describe_services(cluster=cluster_name, services=[service_name])
@@ -12,7 +12,7 @@ def update_ecs_service(cluster_name, service_name, new_environment_variables):
     container_definitions = task_definition['taskDefinition']['containerDefinitions']
     for container_definition in container_definitions:
         if container_definition['name'] == 'moodle':
-            container_definition['environment'] = new_environment_variables
+            container_definition['environment']["MOODLE_SKIP_BOOTSTRAP"] = "yes"
 
     new_task_definition = ecs_client.register_task_definition(
         family=task_definition['taskDefinition']['family'],
@@ -29,8 +29,8 @@ def update_ecs_service(cluster_name, service_name, new_environment_variables):
 def get_new_environment_variables():
     return [
         {
-            'name': 'NEW_ENV_VARIABLE',
-            'value': 'new-value'
+            'name': 'MOODLE_SKIP_BOOTSTRAP',
+            'value': 'yes'
         }
     ]
 

@@ -21,6 +21,9 @@ data "aws_iam_policy_document" "this" {
     effect = "Allow"
 
     actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
       "ecs:DescribeServices",
       "ecs:DescribeTaskDefinition",
       "ecs:RegisterTaskDefinition",
