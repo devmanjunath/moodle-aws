@@ -9,7 +9,7 @@ resource "aws_cloudwatch_event_rule" "this" {
 
   event_pattern = jsonencode({
     "source" : ["aws.ecs"],
-    "detail-type" : ["ECS Deployment State Change"],
+    "detail-type" : ["ECS Task State Change", "ECS Container Instance State Change", "ECS Deployment State Change"],
     "detail" : {
       "clusterArn" : [var.cluster_arn]
     }
