@@ -27,8 +27,8 @@ resource "aws_ecs_service" "this" {
   }
 
   load_balancer {
-    container_name   = var.container_config["name"]
-    container_port   = "8443"
+    container_name   = var.container_config["nginx"]["name"]
+    container_port   = "443"
     target_group_arn = var.target_group_arn
   }
 }

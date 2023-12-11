@@ -8,17 +8,32 @@ variable "project" {
 }
 
 variable "container_config" {
-  type = list(object({
-    name   = string
-    image  = string
-    cpu    = number
-    memory = number
-    portMappings = list(object({
-      containerPort = number
-      hostPort      = number
-    }))
-    environment = list(any)
-  }))
+  type = object(
+    { moodle = object({
+      name   = string
+      cpu    = number
+      memory = number
+      portMappings = list(
+        object({
+          containerPort = number
+          hostPort      = number
+        })
+      )
+      environment = map(string)
+      })
+      nginx = object({
+        name   = string
+        cpu    = number
+        memory = number
+        portMappings = list(
+          object({
+            containerPort = number
+            hostPort      = number
+          })
+        )
+        environment = map(string)
+      })
+  })
 }
 
 variable "container_environment" {

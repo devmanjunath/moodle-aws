@@ -102,8 +102,12 @@ module "asg" {
   subnets = module.network.public_subnets
 }
 
+locals{
+  nginx_environment = 
+}
+
 module "ecs" {
-  depends_on           = [module.network, module.ses, module.efs, module.rds, module.cache, module.load_balancer, module.asg]
+  depends_on           = [module.ses, module.efs, module.rds, module.cache, module.load_balancer, module.asg, module.ecr]
   source               = "./modules/ecs"
   name                 = var.project
   region               = var.region
