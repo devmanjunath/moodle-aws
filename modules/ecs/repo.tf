@@ -3,24 +3,46 @@ locals {
   image_name = lower(var.name)
 }
 
-resource "aws_ecr_repository" "repo" {
+resource "aws_ecr_repository" "nginx" {
   depends_on   = [module.triggers]
   name         = lower(var.name)
   force_delete = true
 }
 
-resource "null_resource" "build_docker_image" {
-  depends_on = [aws_ecr_repository.repo]
+resource "aws_ecr_repository" "moodle" {
+  depends_on   = [module.triggers]
+  name         = lower(var.name)
+  force_delete = true
+}
+
+resource "null_resource" "build_nginx_image" {
+  depends_on = [aws_ecr_repository.nginx]
   triggers = {
     always_run = timestamp()
   }
   provisioner "local-exec" {
-    working_dir = "${path.module}/image"
+    working_dir = "${path.root}/docker/nginx"
     command = join(" && ", [
       "aws ecr get-login-password --region ${var.region} | docker login --username AWS --password-stdin ${local.account_id}.dkr.ecr.${var.region}.amazonaws.com",
       "docker build --no-cache -t ${local.image_name} .",
-      "docker tag ${local.image_name} ${aws_ecr_repository.repo.repository_url}:latest",
-      "docker push ${aws_ecr_repository.repo.repository_url}:latest",
+      "docker tag ${local.image_name} ${aws_ecr_repository.nginx.repository_url}:latest",
+      "docker push ${aws_ecr_repository.nginx.repository_url}:latest",
+    ])
+  }
+}
+
+resource "null_resource" "build_moodle_image" {
+  depends_on = [aws_ecr_repository.moodle]
+  triggers = {
+    always_run = timestamp()
+  }
+  provisioner "local-exec" {
+    working_dir = "${path.root}/docker/moodle"
+    command = join(" && ", [
+      "aws ecr get-login-password --region ${var.region} | docker login --username AWS --password-stdin ${local.account_id}.dkr.ecr.${var.region}.amazonaws.com",
+      "docker build --no-cache -t ${local.image_name} .",
+      "docker tag ${local.image_name} ${aws_ecr_repository.moodle.repository_url}:latest",
+      "docker push ${aws_ecr_repository.moodle.repository_url}:latest",
     ])
   }
 }
