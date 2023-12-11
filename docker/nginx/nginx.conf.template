@@ -1,0 +1,17 @@
+upstream docker_moodle {
+	server	moodle:9000;
+}
+
+server {
+    listen 443;
+    root /var/www/html;
+    location / {
+        index index.php index.html;
+    }
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass moodle:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+    }
+}

@@ -1,0 +1,11 @@
+FROM php:8.0.27-fpm
+
+COPY source/ /var/www/html/
+COPY security.ini /usr/local/etc/php/conf.d/security.ini
+COPY z-www.conf /usr/local/etc/php-fpm.d/z-www.conf
+
+RUN apt update -y
+
+RUN apt install -y libpcre3-dev
+
+RUN curl -sSL https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o - | sh -s gd mysqli intl zip xmlrpc soap exif opcache

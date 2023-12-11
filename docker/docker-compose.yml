@@ -1,0 +1,60 @@
+version: "3.7"
+
+networks:
+  backend:
+
+volumes:
+  html:
+    name: moodle-html
+    driver: local
+
+services:
+  mysql_db:
+    image: mysql
+    container_name: moodle_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: moodle
+      MYSQL_USER: user
+      MYSQL_PASSWORD: root
+  moodle:
+    depends_on: [mysql_db]
+    build:
+      context: ./moodle
+    ports:
+      - "9000:80"
+    volumes:
+      - "html:/var/www/html"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fk http://localhost || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 450s
+    environment:
+      HOST_NAME: ${HOST_NAME}
+      DB_TYPE: ${DB_TYPE}
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      FULL_SITE_NAME: ${FULL_SITE_NAME}
+      SHORT_SITE_NAME: ${SHORT_SITE_NAME}
+      ADMIN_USER: ${ADMIN_USER}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      TZ: ${LOCAL_TIMEZONE}
+    command: >
+      bash -c "
+      if [ -z \"$$(ls -A /var/www/html/config.php)\" ]; then 
+        php /var/www/html/admin/cli/install.php --chmod=0777 --non-interactive --agree-license --wwwroot=http://${HOST_NAME} --dataroot=/var/www/moodle-data --dbtype=$DB_TYPE --dbhost=$DB_HOST --dbname=$DB_NAME --dbuser=$DB_USER --dbpass=$DB_PASSWORD --fullname='$FULL_SITE_NAME' --shortname='$SHORT_SITE_NAME' --adminuser=$ADMIN_USER --adminpass=$ADMIN_PASSWORD && 
+        sed -i \"/$$CFG->directorypermissions = 0777;/a \\$$CFG->xsendfile = 'X-Accel-Redirect';\\n\\$$CFG->xsendfilealiases = array(\\n\\t'/dataroot/' => \\$$CFG->dataroot\\n);\" /var/www/html/config.php && chmod 0644 /var/www/html/config.php; 
+      fi && 
+      grep -qe 'date.timezone = ${LOCAL_TIMEZONE}' /usr/local/etc/php/conf.d/security.ini || echo 'date.timezone = ${LOCAL_TIMEZONE}' >> /usr/local/etc/php/conf.d/security.ini; php-fpm"
+  webserver:
+    build:
+      context: ./nginx
+    ports:
+      - 443:443
+    restart: always
+    volumes:
+      - "html:/var/www/html"
