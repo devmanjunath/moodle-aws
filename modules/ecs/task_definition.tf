@@ -1,5 +1,6 @@
 resource "aws_ecs_task_definition" "task_definition" {
-  depends_on               = [aws_ecs_capacity_provider.this, null_resource.build_docker_image]
+  depends_on = [aws_ecs_capacity_provider.this,
+  null_resource.build_nginx_image, null_resource.build_moodle_image]
   family                   = "${var.name}-Definition"
   requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"

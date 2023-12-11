@@ -8,7 +8,7 @@ variable "project" {
 }
 
 variable "container_config" {
-  type = object({
+  type = list(object({
     name   = string
     image  = string
     cpu    = number
@@ -17,7 +17,8 @@ variable "container_config" {
       containerPort = number
       hostPort      = number
     }))
-  })
+    environment = list(any)
+  }))
 }
 
 variable "container_environment" {

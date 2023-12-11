@@ -116,13 +116,13 @@ module "ecs" {
   asg_arn              = module.asg.autoscaling_group_arn
   container_environments = merge(var.container_environment,
     {
-      "MOODLE_DATABASE_PASSWORD" = module.rds.db_password
-      "MOODLE_DATABASE_HOST"     = module.rds.db_endpoint
-      "MOODLE_DATABASE_USER"     = module.rds.db_username
-      "MOODLE_SKIP_BOOTSTRAP"    = module.rds.db_snapshot_exists ? "yes" : "no"
-      "MOODLE_SMTP_HOST"         = "email-smtp.${var.region}.amazonaws.com"
-      "MOODLE_SMTP_PORT"         = "25"
-      "MOODLE_SMTP_PASSWORD"     = module.ses.smtp_password
+      "DB_PASSWORD"    = module.rds.db_password
+      "DB_HOST"        = module.rds.db_endpoint
+      "DB_USER"        = module.rds.db_username
+      "SKIP_BOOTSTRAP" = module.rds.db_snapshot_exists ? "yes" : "no"
+      "SMTP_HOST"      = "email-smtp.${var.region}.amazonaws.com"
+      "SMTP_PORT"      = "25"
+      "SMTP_PASSWORD"  = module.ses.smtp_password
   })
   subnets = module.network.public_subnets
   efs_id  = module.efs.efs_id
