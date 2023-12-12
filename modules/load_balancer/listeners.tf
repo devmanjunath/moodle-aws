@@ -8,7 +8,7 @@ resource "aws_lb_listener" "http_listener" {
   default_action {
     type = "redirect"
     redirect {
-      port        = "8443"
+      port        = "443"
       protocol    = "HTTPS"
       status_code = "HTTP_301"
     }

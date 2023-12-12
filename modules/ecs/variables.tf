@@ -45,3 +45,11 @@ variable "efs_access_point_id" {
 variable "asg_arn" {
   type = string
 }
+
+variable "nginx_image_uri" {
+  type = string
+}
+
+variable "moodle_image_uri" {
+  type = string
+}

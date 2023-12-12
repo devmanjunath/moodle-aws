@@ -59,13 +59,12 @@ module "ses" {
 }
 
 module "rds" {
-  depends_on = [module.network]
-  source     = "./modules/rds"
-  name       = var.project
-  vpc_id     = module.network.vpc_id
-  subnets    = module.network.private_subnets
+  source  = "./modules/rds"
+  name    = var.project
+  vpc_id  = module.network.vpc_id
+  subnets = module.network.private_subnets
   security_group = [
-    module.network.allow_mysql,
+    module.network.allow_mysql
   ]
 }
 
@@ -100,8 +99,16 @@ module "asg" {
   subnets = module.network.public_subnets
 }
 
+module "ecr" {
+  depends_on     = [module.network]
+  source         = "./modules/ecr"
+  name           = var.project
+  region         = var.region
+  image_to_build = ["nginx", "moodle"]
+}
+
 module "ecs" {
-  depends_on           = [module.ses, module.efs, module.rds, module.cache, module.load_balancer, module.asg]
+  depends_on           = [module.ses, module.efs, module.rds, module.cache, module.load_balancer, module.asg, module.ecr]
   source               = "./modules/ecs"
   name                 = var.project
   region               = var.region
@@ -112,6 +119,8 @@ module "ecs" {
   efs_access_point_id  = module.efs.access_point_id
   target_group_arn     = module.load_balancer.target_group_arn
   asg_arn              = module.asg.autoscaling_group_arn
+  moodle_image_uri     = module.ecr.moodle_image_uri
+  nginx_image_uri      = module.ecr.nginx_image_uri
   # container_environments = merge(var.container_environment,
   #   {
   #     "DB_PASSWORD"    = module.rds.db_password

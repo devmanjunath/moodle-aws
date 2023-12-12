@@ -1,6 +1,5 @@
 resource "aws_ecs_task_definition" "task_definition" {
-  depends_on = [aws_ecs_capacity_provider.this,
-  null_resource.build_nginx_image, null_resource.build_moodle_image]
+  depends_on = [aws_ecs_capacity_provider.this]
   family                   = "${var.name}-Definition"
   requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
@@ -26,7 +25,7 @@ resource "aws_ecs_task_definition" "task_definition" {
         }
       ],
       name  = var.container_config["moodle"]["name"],
-      image = "${aws_ecr_repository.moodle.repository_url}:latest"
+      image = "${var.moodle_image_uri}:latest"
       logConfiguration = {
         logDriver = "awslogs",
         options = {
@@ -53,7 +52,7 @@ resource "aws_ecs_task_definition" "task_definition" {
         }
       ],
       name  = var.container_config["nginx"]["name"],
-      image = "${aws_ecr_repository.moodle.repository_url}:latest"
+      image = "${var.nginx_image_uri}:latest"
       logConfiguration = {
         logDriver = "awslogs",
         options = {
@@ -84,8 +83,8 @@ resource "aws_ecs_task_definition" "task_definition" {
       driver = "local"
     }
   }
-  cpu                = var.container_config["cpu"]
-  memory             = var.container_config["memory"]
+  cpu                = var.container_config["moodle"]["cpu"]
+  memory             = var.container_config["nginx"]["memory"]
   task_role_arn      = aws_iam_role.this.arn
   execution_role_arn = aws_iam_role.this.arn
 }
