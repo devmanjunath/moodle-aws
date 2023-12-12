@@ -11,13 +11,11 @@ provider "aws" {
 locals {
   public_subnets = {
     "${var.region}a" : "10.0.1.0/24",
-    "${var.region}b" : "10.0.2.0/24",
-    "${var.region}c" : "10.0.3.0/24"
+    "${var.region}b" : "10.0.2.0/24"
   }
   private_subnets = {
     "${var.region}a" : "10.0.4.0/24",
-    "${var.region}b" : "10.0.5.0/24",
-    "${var.region}c" : "10.0.6.0/24"
+    "${var.region}b" : "10.0.5.0/24"
   }
 }
 
