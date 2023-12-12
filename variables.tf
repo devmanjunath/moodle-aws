@@ -35,7 +35,3 @@ variable "container_config" {
       })
   })
 }
-
-variable "container_environment" {
-  type = map(string)
-}

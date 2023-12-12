@@ -10,6 +10,10 @@ output "public_subnets" {
   value = [for subnet in aws_subnet.public_subnets : subnet.id]
 }
 
+output "private_subnets" {
+  value = [for subnet in aws_subnet.private_subnets : subnet.id]
+}
+
 output "allow_ssh_sg" {
   value = aws_security_group.allow_ssh.id
 }

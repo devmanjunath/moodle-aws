@@ -65,7 +65,7 @@ module "rds" {
   source     = "./modules/rds"
   name       = var.project
   vpc_id     = module.network.vpc_id
-  subnets    = module.network.public_subnets
+  subnets    = module.network.private_subnets
   security_group = [
     module.network.allow_mysql,
   ]
@@ -75,7 +75,7 @@ module "cache" {
   depends_on = [module.network]
   source     = "./modules/cache"
   name       = var.project
-  subnets    = module.network.public_subnets
+  subnets    = module.network.private_subnets
   security_group = [
     module.network.allow_redis,
   ]
@@ -85,7 +85,7 @@ module "efs" {
   depends_on       = [module.network]
   source           = "./modules/efs"
   name             = var.project
-  subnets_to_mount = module.network.public_subnets
+  subnets_to_mount = module.network.private_subnets
   security_group   = [module.network.allow_nfs_sg]
 }
 
@@ -102,12 +102,8 @@ module "asg" {
   subnets = module.network.public_subnets
 }
 
-locals{
-  nginx_environment = 
-}
-
 module "ecs" {
-  depends_on           = [module.ses, module.efs, module.rds, module.cache, module.load_balancer, module.asg, module.ecr]
+  depends_on           = [module.ses, module.efs, module.rds, module.cache, module.load_balancer, module.asg]
   source               = "./modules/ecs"
   name                 = var.project
   region               = var.region
@@ -118,16 +114,16 @@ module "ecs" {
   efs_access_point_id  = module.efs.access_point_id
   target_group_arn     = module.load_balancer.target_group_arn
   asg_arn              = module.asg.autoscaling_group_arn
-  container_environments = merge(var.container_environment,
-    {
-      "DB_PASSWORD"    = module.rds.db_password
-      "DB_HOST"        = module.rds.db_endpoint
-      "DB_USER"        = module.rds.db_username
-      "SKIP_BOOTSTRAP" = module.rds.db_snapshot_exists ? "yes" : "no"
-      "SMTP_HOST"      = "email-smtp.${var.region}.amazonaws.com"
-      "SMTP_PORT"      = "25"
-      "SMTP_PASSWORD"  = module.ses.smtp_password
-  })
+  # container_environments = merge(var.container_environment,
+  #   {
+  #     "DB_PASSWORD"    = module.rds.db_password
+  #     "DB_HOST"        = module.rds.db_endpoint
+  #     "DB_USER"        = module.rds.db_username
+  #     "SKIP_BOOTSTRAP" = module.rds.db_snapshot_exists ? "yes" : "no"
+  #     "SMTP_HOST"      = "email-smtp.${var.region}.amazonaws.com"
+  #     "SMTP_PORT"      = "25"
+  #     "SMTP_PASSWORD"  = module.ses.smtp_password
+  # })
   subnets = module.network.public_subnets
   efs_id  = module.efs.efs_id
   security_group = [
