@@ -19,7 +19,6 @@ variable "container_config" {
           hostPort      = number
         })
       )
-      environment = map(string)
       })
       nginx = object({
         name   = string
@@ -31,7 +30,13 @@ variable "container_config" {
             hostPort      = number
           })
         )
-        environment = map(string)
       })
+  })
+}
+
+variable "environment" {
+  type = object({
+    moodle = map(string)
+    nginx  = map(string)
   })
 }

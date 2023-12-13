@@ -53,3 +53,10 @@ variable "nginx_image_uri" {
 variable "moodle_image_uri" {
   type = string
 }
+
+variable "environment" {
+  type = object({
+    moodle = map(string)
+    nginx  = map(string)
+  })
+}

@@ -2,16 +2,7 @@ region  = "ap-south-1"
 project = "Test-Drive"
 container_config = {
   moodle = {
-    cpu = 2048
-    environment = {
-      DB_TYPE         = "auroramysql"
-      HOST_NAME       = "cloudbreathe.in"
-      CACHE_HOST      = "something"
-      ADMIN_USER      = "user"
-      ADMIN_PASSWORD  = "bitnami"
-      FULL_SITE_NAME  = "Test Drive"
-      SHORT_SITE_NAME = "test-drive"
-    }
+    cpu    = 2048
     memory = 4096
     name   = "moodle"
     portMappings = [{
@@ -28,6 +19,20 @@ container_config = {
       containerPort = 443
       hostPort      = 443
     }]
-    environment = {}
+  }
+}
+
+environment = {
+  moodle = {
+    DB_TYPE         = "auroramysql"
+    HOST_NAME       = "cloudbreathe.in"
+    CACHE_HOST      = "something"
+    ADMIN_USER      = "user"
+    ADMIN_PASSWORD  = "bitnami"
+    FULL_SITE_NAME  = "Test Drive"
+    SHORT_SITE_NAME = "test-drive"
+  }
+  nginx = {
+    CONTAINER_NAME = "moodle"
   }
 }

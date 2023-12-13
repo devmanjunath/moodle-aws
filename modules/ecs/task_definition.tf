@@ -1,5 +1,5 @@
 resource "aws_ecs_task_definition" "task_definition" {
-  depends_on = [aws_ecs_capacity_provider.this]
+  depends_on               = [aws_ecs_capacity_provider.this]
   family                   = "${var.name}-Definition"
   requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
@@ -8,12 +8,20 @@ resource "aws_ecs_task_definition" "task_definition" {
     {
       portMappings = var.container_config["moodle"]["portMappings"]
       essential    = true
+      healthCheck = {
+        command     = ["CMD-SHELL", "curl -fk http://localhost || exit 1"]
+        interval    = 10
+        timeout     = 5
+        retries     = 5
+        startPeriod = 300
+      }
       environment = [
-        for key, value in var.container_config["moodle"]["environment"] : {
+        for key, value in var.environment["moodle"] : {
           name  = key
           value = value
         }
       ]
+      command = ["echo 'Hello World'"]
       mountPoints = [
         {
           containerPath = "/var/www/moodle-data",
@@ -37,10 +45,14 @@ resource "aws_ecs_task_definition" "task_definition" {
       }
     },
     {
+      dependsOn = [{
+        containerName = "${var.container_config["moodle"]["name"]}"
+        condition     = "HEALTHY"
+      }]
       portMappings = var.container_config["nginx"]["portMappings"]
       essential    = true
       environment = [
-        for key, value in var.container_config["nginx"]["environment"] : {
+        for key, value in var.environment["nginx"] : {
           name  = key
           value = value
         }
