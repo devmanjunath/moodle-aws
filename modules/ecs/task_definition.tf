@@ -21,7 +21,31 @@ resource "aws_ecs_task_definition" "task_definition" {
           value = value
         }
       ]
-      command = ["echo 'Hello World'"]
+      command = [
+        "/bin/sh",
+        "-c",
+        join(
+          " ",
+          ["if [ \"${var.environment["moodle"]["SKIP_BOOTSTRAP"]}\" == \"no\" ];",
+            "then php /var/www/html/admin/cli/install.php",
+            "--chmod=0777",
+            "--non-interactive",
+            "--agree-license",
+            "--wwwroot=https://${var.environment["moodle"]["HOST_NAME"]}",
+            "--dataroot=/var/www/moodledata",
+            "--dbtype=auroramysql",
+            "--dbhost=${var.environment["moodle"]["DB_HOST"]}",
+            "--dbname=moodle",
+            "--dbuser=${var.environment["moodle"]["DB_USER"]}",
+            "--dbpass=${var.environment["moodle"]["DB_PASSWORD"]}",
+            "--fullname='${var.environment["moodle"]["FULL_SITE_NAME"]}'",
+            "--shortname='${var.environment["moodle"]["SHORT_SITE_NAME"]}'",
+            "--adminuser=admin",
+            "--adminpass=admin123;",
+            "else mv /var/www/html/config_bak.php /var/www/html/config.php fi; php-fpm"
+          ]
+        ),
+      ]
       mountPoints = [
         {
           containerPath = "/var/www/moodle-data",
@@ -37,7 +61,7 @@ resource "aws_ecs_task_definition" "task_definition" {
       logConfiguration = {
         logDriver = "awslogs",
         options = {
-          awslogs-group         = "${var.name}"
+          awslogs-group         = var.container_config["moodle"]["name"]
           awslogs-create-group  = "true"
           awslogs-region        = "ap-south-1"
           awslogs-stream-prefix = "ecs"
@@ -68,7 +92,7 @@ resource "aws_ecs_task_definition" "task_definition" {
       logConfiguration = {
         logDriver = "awslogs",
         options = {
-          awslogs-group         = "${var.name}"
+          awslogs-group         = var.container_config["nginx"]["name"]
           awslogs-create-group  = "true"
           awslogs-region        = "ap-south-1"
           awslogs-stream-prefix = "ecs"
