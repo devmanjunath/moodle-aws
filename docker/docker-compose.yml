@@ -22,26 +22,7 @@ services:
     build:
       context: ./moodle
     ports:
-      - "9000:9000"
-    volumes:
-      - "html:/var/www/html"
-    # healthcheck:
-    #   test: ["CMD-SHELL", "curl -f http://localhost || exit 1"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
-    #   start_period: 100s
+      - "443:443"
     command: >
       bash -c "if [ 'no' = 'no' ]; then php /var/www/html/admin/cli/install.php --chmod=0777 --non-interactive --agree-license --wwwroot=http://localhost --dataroot=/var/www/moodledata --dbtype=mysqli --dbhost=mysql_db --dbname=moodle --dbuser=user --dbpass=root --fullname='Test Drive' --shortname='test-drive' --adminuser=admin --adminpass=admin123 && sed -i \"/$$CFG->directorypermissions = 0777;/a \\$$CFG->xsendfile = 'X-Accel-Redirect';\\n\\$$CFG->xsendfilealiases = array(\\n\\t'/dataroot/' => \\$$CFG->dataroot\\n);\" /var/www/html/config.php && chmod 0644 /var/www/html/config.php; fi && 
-      grep -qe 'date.timezone = ${LOCAL_TIMEZONE}' /usr/local/etc/php/conf.d/security.ini || echo 'date.timezone = ${LOCAL_TIMEZONE}' >> /usr/local/etc/php/conf.d/security.ini; php-fpm"
-
-  webserver:
-    build:
-      context: ./nginx
-    environment:
-      CONTAINER_NAME: moodle
-    ports:
-      - 443:443
-    restart: always
-    volumes:
-      - "html:/var/www/html"
+      grep -qe 'date.timezone = ${LOCAL_TIMEZONE}' /usr/local/etc/php/conf.d/security.ini || echo 'date.timezone = ${LOCAL_TIMEZONE}' >> /usr/local/etc/php/conf.d/security.ini; php-fpm restart"

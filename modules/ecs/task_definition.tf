@@ -2,7 +2,7 @@ resource "aws_ecs_task_definition" "task_definition" {
   depends_on               = [aws_ecs_capacity_provider.this]
   family                   = "${var.name}-Definition"
   requires_compatibilities = ["EC2"]
-  network_mode             = "awsvpc"
+  network_mode             = "bridge"
   skip_destroy             = true
   container_definitions = jsonencode([
     {
@@ -74,10 +74,6 @@ resource "aws_ecs_task_definition" "task_definition" {
       }
     },
     {
-      dependsOn = [{
-        containerName = "${var.container_config["moodle"]["name"]}"
-        condition     = "HEALTHY"
-      }]
       portMappings = var.container_config["nginx"]["portMappings"]
       essential    = true
       environment = [

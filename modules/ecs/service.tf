@@ -6,10 +6,10 @@ resource "aws_ecs_service" "this" {
   desired_count        = 1
   force_new_deployment = false
 
-  network_configuration {
-    security_groups  = var.security_group
-    subnets          = var.subnets
-  }
+  # network_configuration {
+  #   security_groups  = var.security_group
+  #   subnets          = var.subnets
+  # }
 
   ordered_placement_strategy {
     type  = "spread"
