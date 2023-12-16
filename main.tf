@@ -104,7 +104,7 @@ module "ecr" {
   source         = "./modules/ecr"
   name           = var.project
   region         = var.region
-  image_to_build = ["nginx", "moodle"]
+  image_to_build = ["moodle"]
 }
 
 locals {
@@ -117,11 +117,6 @@ locals {
       SMTP_HOST      = "email-smtp.${var.region}.amazonaws.com"
       SMTP_PORT      = "25"
       SMTP_PASSWORD  = module.ses.smtp_password
-    }
-  ) }
-  updated_nginx_environment = { nginx = merge(var.environment["nginx"],
-    {
-      "CONTAINER_NAME" = var.container_config["moodle"]["name"]
     }
   ) }
 }
@@ -139,10 +134,9 @@ module "ecs" {
   target_group_arn     = module.load_balancer.target_group_arn
   asg_arn              = module.asg.autoscaling_group_arn
   moodle_image_uri     = module.ecr.moodle_image_uri
-  nginx_image_uri      = module.ecr.nginx_image_uri
   subnets              = module.network.public_subnets
   efs_id               = module.efs.efs_id
-  environment          = merge(local.updated_moodle_environment, local.updated_nginx_environment)
+  environment          = merge(local.updated_moodle_environment)
   security_group = [
     module.network.allow_ssh_sg,
     module.network.allow_nfs_sg,

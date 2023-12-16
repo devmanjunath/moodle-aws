@@ -2,19 +2,12 @@ resource "aws_ecs_task_definition" "task_definition" {
   depends_on               = [aws_ecs_capacity_provider.this]
   family                   = "${var.name}-Definition"
   requires_compatibilities = ["EC2"]
-  network_mode             = "bridge"
+  network_mode             = "awsvpc"
   skip_destroy             = true
   container_definitions = jsonencode([
     {
       portMappings = var.container_config["moodle"]["portMappings"]
       essential    = true
-      # healthCheck = {
-      #   command     = ["CMD-SHELL", "curl -f http://localhost:9000/ || exit 1"]
-      #   interval    = 10
-      #   timeout     = 5
-      #   retries     = 5
-      #   startPeriod = 300
-      # }
       environment = [
         for key, value in var.environment["moodle"] : {
           name  = key
@@ -27,7 +20,7 @@ resource "aws_ecs_task_definition" "task_definition" {
         join(
           " ",
           ["if [ '${var.environment["moodle"]["SKIP_BOOTSTRAP"]}' = 'no' ];",
-            "then php /var/www/html/admin/cli/install.php",
+            "then php /var/www/html/moodle/admin/cli/install.php",
             "--chmod=0777",
             "--non-interactive",
             "--agree-license",
@@ -42,23 +35,19 @@ resource "aws_ecs_task_definition" "task_definition" {
             "--shortname='${var.environment["moodle"]["SHORT_SITE_NAME"]}'",
             "--adminuser=admin",
             "--adminpass=admin123",
-            "&& sed -i \"/$$CFG->directorypermissions = 0777;/a \\$$CFG->xsendfile = 'X-Accel-Redirect';\\n\\$$CFG->xsendfilealiases = array(\\n\\t'/dataroot/' => \\$$CFG->dataroot\\n);\" /var/www/html/config.php && chmod 0644 /var/www/html/config.php;",
+            "&& sed -i \"/$$CFG->directorypermissions = 0777;/a \\$$CFG->xsendfile = 'X-Accel-Redirect';\\n\\$$CFG->xsendfilealiases = array(\\n\\t'/dataroot/' => \\$$CFG->dataroot\\n);\" /var/www/html/moodle/config.php && chmod 0644 /var/www/html/moodle/config.php;",
             "else echo \"hello world\"; fi \n",
             "grep",
             "-qe",
             "'date.timezone = local_timezone'",
             "/usr/local/etc/php/conf.d/security.ini",
-            "|| echo 'date.timezone = local_timezone' >> /usr/local/etc/php/conf.d/security.ini; php-fpm"
+            "|| echo 'date.timezone = local_timezone' >> /usr/local/etc/php/conf.d/security.ini; sh /etc/entrypoint.sh"
         ])
       ]
       mountPoints = [
         {
           containerPath = "/var/www/moodle-data",
           sourceVolume  = "${var.name}-volume"
-        },
-        {
-          containerPath = "/var/www/html",
-          sourceVolume  = "moodle-shared"
         }
       ],
       name  = var.container_config["moodle"]["name"],
@@ -67,33 +56,6 @@ resource "aws_ecs_task_definition" "task_definition" {
         logDriver = "awslogs",
         options = {
           awslogs-group         = var.container_config["moodle"]["name"]
-          awslogs-create-group  = "true"
-          awslogs-region        = "ap-south-1"
-          awslogs-stream-prefix = "ecs"
-        }
-      }
-    },
-    {
-      portMappings = var.container_config["nginx"]["portMappings"]
-      essential    = true
-      environment = [
-        for key, value in var.environment["nginx"] : {
-          name  = key
-          value = value
-        }
-      ]
-      mountPoints = [
-        {
-          containerPath = "/var/www/html",
-          sourceVolume  = "moodle-shared"
-        }
-      ],
-      name  = var.container_config["nginx"]["name"],
-      image = "${var.nginx_image_uri}:latest"
-      logConfiguration = {
-        logDriver = "awslogs",
-        options = {
-          awslogs-group         = var.container_config["nginx"]["name"]
           awslogs-create-group  = "true"
           awslogs-region        = "ap-south-1"
           awslogs-stream-prefix = "ecs"
@@ -113,15 +75,8 @@ resource "aws_ecs_task_definition" "task_definition" {
       }
     }
   }
-  volume {
-    name = "moodle-shared"
-    docker_volume_configuration {
-      scope  = "task"
-      driver = "local"
-    }
-  }
   cpu                = var.container_config["moodle"]["cpu"]
-  memory             = var.container_config["nginx"]["memory"]
+  memory             = var.container_config["moodle"]["memory"]
   task_role_arn      = aws_iam_role.this.arn
   execution_role_arn = aws_iam_role.this.arn
 }

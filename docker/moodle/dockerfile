@@ -11,12 +11,15 @@ RUN apt install -y nginx-full libpcre3-dev
 RUN mkdir /var/www/moodledata
 
 ## Copy all required files & folders to the container
-COPY source/ /var/www/html/
+COPY source/ /var/www/html/moodle/
 COPY security.ini /usr/local/etc/php/conf.d/security.ini
 COPY z-www.conf /usr/local/etc/php-fpm.d/z-www.conf
 COPY moodle.conf /etc/nginx/sites-available/moodle.conf
 COPY php.ini /etc/php/8.0/fpm/php.ini
 COPY entrypoint.sh /etc/entrypoint.sh
+
+RUN chown -R www-data:www-data /var/www/html/moodle/ 
+RUN chmod -R 755 /var/www/html/moodle/
 
 ## Install extensions for PHP via Docker
 RUN curl -sSL https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o - | sh -s gd mysqli intl zip xmlrpc soap exif opcache
@@ -25,6 +28,4 @@ RUN ln -s /etc/nginx/sites-available/moodle.conf /etc/nginx/sites-enabled/
 
 RUN nginx -t
 
-EXPOSE 443
-
-ENTRYPOINT ["sh", "/etc/entrypoint.sh"]
+EXPOSE 80 443

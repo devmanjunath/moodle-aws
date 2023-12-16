@@ -20,23 +20,11 @@ variable "container_config" {
         })
       )
       })
-      nginx = object({
-        name   = string
-        cpu    = number
-        memory = number
-        portMappings = list(
-          object({
-            containerPort = number
-            hostPort      = number
-          })
-        )
-      })
   })
 }
 
 variable "environment" {
   type = object({
     moodle = map(string)
-    nginx  = map(string)
   })
 }

@@ -6,16 +6,16 @@ resource "aws_ecs_service" "this" {
   desired_count        = 1
   force_new_deployment = false
 
-  # network_configuration {
-  #   security_groups  = var.security_group
-  #   subnets          = var.subnets
-  # }
+  network_configuration {
+    security_groups = var.security_group
+    subnets         = var.subnets
+  }
 
   ordered_placement_strategy {
     type  = "spread"
     field = "attribute:ecs.availability-zone"
   }
-  
+
   ordered_placement_strategy {
     type  = "binpack"
     field = "memory"
@@ -27,7 +27,7 @@ resource "aws_ecs_service" "this" {
   }
 
   load_balancer {
-    container_name   = var.container_config["nginx"]["name"]
+    container_name   = var.container_config["moodle"]["name"]
     container_port   = "443"
     target_group_arn = var.target_group_arn
   }

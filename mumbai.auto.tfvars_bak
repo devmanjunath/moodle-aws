@@ -10,16 +10,6 @@ container_config = {
       hostPort      = 9000
     }]
   }
-  nginx = {
-    cpu         = 2048
-    environment = []
-    memory      = 4096
-    name        = "nginx"
-    portMappings = [{
-      containerPort = 443
-      hostPort      = 443
-    }]
-  }
 }
 
 environment = {
@@ -31,8 +21,5 @@ environment = {
     ADMIN_PASSWORD  = "bitnami"
     FULL_SITE_NAME  = "Test Drive"
     SHORT_SITE_NAME = "test-drive"
-  }
-  nginx = {
-    CONTAINER_NAME = "moodle"
   }
 }
