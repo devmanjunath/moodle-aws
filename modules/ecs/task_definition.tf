@@ -8,13 +8,13 @@ resource "aws_ecs_task_definition" "task_definition" {
     {
       portMappings = var.container_config["moodle"]["portMappings"]
       essential    = true
-      healthCheck = {
-        command     = ["CMD-SHELL", "curl -f http://localhost:9000/ || exit 1"]
-        interval    = 10
-        timeout     = 5
-        retries     = 5
-        startPeriod = 300
-      }
+      # healthCheck = {
+      #   command     = ["CMD-SHELL", "curl -f http://localhost:9000/ || exit 1"]
+      #   interval    = 10
+      #   timeout     = 5
+      #   retries     = 5
+      #   startPeriod = 300
+      # }
       environment = [
         for key, value in var.environment["moodle"] : {
           name  = key

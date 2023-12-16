@@ -1,5 +1,6 @@
 FROM php:8.0.27-fpm
 
+RUN mkdir /var/www/moodledata
 COPY source/ /var/www/html/
 COPY security.ini /usr/local/etc/php/conf.d/security.ini
 COPY z-www.conf /usr/local/etc/php-fpm.d/z-www.conf
