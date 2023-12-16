@@ -46,7 +46,7 @@ resource "aws_ecs_task_definition" "task_definition" {
       ]
       mountPoints = [
         {
-          containerPath = "/var/www/moodle-data",
+          containerPath = "/var/www/moodledata",
           sourceVolume  = "${var.name}-volume"
         }
       ],

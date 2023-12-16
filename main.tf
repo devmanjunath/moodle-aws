@@ -96,7 +96,7 @@ module "asg" {
     module.network.allow_nfs_sg,
     module.network.allow_web_sg,
   ]
-  subnets = module.network.public_subnets
+  subnets = module.network.private_subnets
 }
 
 module "ecr" {
@@ -110,6 +110,7 @@ module "ecr" {
 locals {
   updated_moodle_environment = { moodle = merge(var.environment["moodle"],
     {
+      CONTAINER_NAME = "cloudbreathe.in"
       DB_PASSWORD    = module.rds.db_password
       DB_HOST        = module.rds.db_endpoint
       DB_USER        = module.rds.db_username

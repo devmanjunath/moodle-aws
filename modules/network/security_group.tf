@@ -53,9 +53,9 @@ resource "aws_security_group" "allow_web" {
   }
 
   ingress {
-    description = "Allow Port 8443"
-    from_port   = 8443
-    to_port     = 8443
+    description = "Allow Port 443"
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

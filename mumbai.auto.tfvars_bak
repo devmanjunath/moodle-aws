@@ -6,8 +6,8 @@ container_config = {
     memory = 4096
     name   = "moodle"
     portMappings = [{
-      containerPort = 9000
-      hostPort      = 9000
+      containerPort = 443
+      hostPort      = 443
     }]
   }
 }
