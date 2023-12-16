@@ -9,7 +9,7 @@ resource "aws_ecs_task_definition" "task_definition" {
       portMappings = var.container_config["moodle"]["portMappings"]
       essential    = true
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -fk http://localhost || exit 1"]
+        command     = ["CMD-SHELL", "curl -f http://localhost:9000/ || exit 1"]
         interval    = 10
         timeout     = 5
         retries     = 5
@@ -26,7 +26,7 @@ resource "aws_ecs_task_definition" "task_definition" {
         "-c",
         join(
           " ",
-          ["if [ \"${var.environment["moodle"]["SKIP_BOOTSTRAP"]}\" == \"no\" ];",
+          ["if [ '${var.environment["moodle"]["SKIP_BOOTSTRAP"]}' = 'no' ];",
             "then php /var/www/html/admin/cli/install.php",
             "--chmod=0777",
             "--non-interactive",
@@ -41,10 +41,15 @@ resource "aws_ecs_task_definition" "task_definition" {
             "--fullname='${var.environment["moodle"]["FULL_SITE_NAME"]}'",
             "--shortname='${var.environment["moodle"]["SHORT_SITE_NAME"]}'",
             "--adminuser=admin",
-            "--adminpass=admin123;",
-            "else mv /var/www/html/config_bak.php /var/www/html/config.php fi; php-fpm"
-          ]
-        ),
+            "--adminpass=admin123",
+            "&& sed -i \"/$$CFG->directorypermissions = 0777;/a \\$$CFG->xsendfile = 'X-Accel-Redirect';\\n\\$$CFG->xsendfilealiases = array(\\n\\t'/dataroot/' => \\$$CFG->dataroot\\n);\" /var/www/html/config.php && chmod 0644 /var/www/html/config.php;",
+            "else echo \"hello world\"; fi \n",
+            "grep",
+            "-qe",
+            "'date.timezone = local_timezone'",
+            "/usr/local/etc/php/conf.d/security.ini",
+            "|| echo 'date.timezone = local_timezone' >> /usr/local/etc/php/conf.d/security.ini; php-fpm"
+        ])
       ]
       mountPoints = [
         {

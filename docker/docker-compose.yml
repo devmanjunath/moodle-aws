@@ -26,39 +26,26 @@ services:
     volumes:
       - "html:/var/www/html"
     healthcheck:
-      test: ["CMD-SHELL", "curl -fk http://localhost || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/ || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 5s
       start_period: 450s
-    environment:
-      HOST_NAME: ${HOST_NAME}
-      DB_TYPE: ${DB_TYPE}
-      DB_HOST: ${DB_HOST}
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      FULL_SITE_NAME: ${FULL_SITE_NAME}
-      SHORT_SITE_NAME: ${SHORT_SITE_NAME}
-      ADMIN_USER: ${ADMIN_USER}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-      TZ: ${LOCAL_TIMEZONE}
     command: >
-      bash -c "\
-      if [ ! -f /var/www/html/config.php ]; then
+      bash -c "if [ ! -f /var/www/html/config.php ]; then
         php /var/www/html/admin/cli/install.php \
             --chmod=0777 \
             --non-interactive \
             --agree-license \
-            --wwwroot=https://${HOST_NAME} \
+            --wwwroot=http://localhost \
             --dataroot=/var/www/moodledata \
-            --dbtype=mariadb \
+            --dbtype=mysqli \
             --dbhost=database \
-            --dbname=${DB_NAME} \
-            --dbuser=${DB_USER} \
-            --dbpass=${DB_PASSWORD} \
-            --fullname=${FULL_SITE_NAME} \
-            --shortname=${SHORT_SITE_NAME} \
+            --dbname=moodle \
+            --dbuser=user \
+            --dbpass=root \
+            --fullname='Test Drive' \
+            --shortname='test-drive' \
             --adminuser=admin \
             --adminpass=admin123 && \
             

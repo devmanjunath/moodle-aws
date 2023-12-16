@@ -113,7 +113,7 @@ locals {
       DB_PASSWORD    = module.rds.db_password
       DB_HOST        = module.rds.db_endpoint
       DB_USER        = module.rds.db_username
-      SKIP_BOOTSTRAP = module.rds.db_snapshot_exists ? "yes" : "no"
+      SKIP_BOOTSTRAP = "yes" #module.rds.db_snapshot_exists ? "yes" : "no"
       SMTP_HOST      = "email-smtp.${var.region}.amazonaws.com"
       SMTP_PORT      = "25"
       SMTP_PASSWORD  = module.ses.smtp_password
