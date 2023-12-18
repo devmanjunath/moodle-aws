@@ -41,6 +41,24 @@ data "aws_iam_policy_document" "efs-access-policy" {
   }
 }
 
+resource "aws_iam_policy_attachment" "ecs_role" {
+  name       = "ecs-service-role-attachment"
+  roles      = [aws_iam_role.this.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
+}
+
+resource "aws_iam_policy_attachment" "ssm_role" {
+  name       = "ecs-service-role-attachment"
+  roles      = [aws_iam_role.this.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
+}
+
+resource "aws_iam_policy_attachment" "ec2_instance_role" {
+  name       = "ecs-service-role-attachment"
+  roles      = [aws_iam_role.this.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
 resource "aws_iam_policy_attachment" "service_role" {
   name       = "ecs-service-role-attachment"
   roles      = [aws_iam_role.this.name]
