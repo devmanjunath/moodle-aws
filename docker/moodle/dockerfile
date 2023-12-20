@@ -17,6 +17,8 @@ COPY z-www.conf /usr/local/etc/php-fpm.d/z-www.conf
 COPY moodle.conf /etc/nginx/sites-available/moodle.conf
 COPY php.ini /etc/php/8.0/fpm/php.ini
 COPY entrypoint.sh /etc/entrypoint.sh
+COPY server-key.pem /etc/ssl/server-key.pem
+COPY server.pem /etc/ssl/server.pem
 
 RUN chown -R www-data:www-data /var/www/html/moodle/ 
 RUN chmod -R 755 /var/www/html/moodle/
@@ -28,4 +30,4 @@ RUN ln -s /etc/nginx/sites-available/moodle.conf /etc/nginx/sites-enabled/
 
 RUN nginx -t
 
-EXPOSE 80 443
+EXPOSE 443

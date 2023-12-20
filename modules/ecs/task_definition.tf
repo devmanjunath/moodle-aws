@@ -1,11 +1,13 @@
 resource "aws_ecs_task_definition" "task_definition" {
-  depends_on               = [aws_ecs_capacity_provider.this]
+  # depends_on               = [aws_ecs_capacity_provider.this]
   family                   = "${var.name}-Definition"
-  requires_compatibilities = ["EC2"]
+  requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   skip_destroy             = true
   container_definitions = jsonencode([
     {
+      cpu          = var.container_config["moodle"]["cpu"]
+      memory       = var.container_config["moodle"]["memory"]
       portMappings = var.container_config["moodle"]["portMappings"]
       essential    = true
       environment = [
@@ -24,17 +26,17 @@ resource "aws_ecs_task_definition" "task_definition" {
             "--chmod=0777",
             "--non-interactive",
             "--agree-license",
-            "--wwwroot=https://${var.environment["moodle"]["HOST_NAME"]}",
-            "--dataroot=/var/www/moodledata",
-            "--dbtype=auroramysql",
-            "--dbhost=${var.environment["moodle"]["DB_HOST"]}",
-            "--dbname=moodle",
-            "--dbuser=${var.environment["moodle"]["DB_USER"]}",
-            "--dbpass=${var.environment["moodle"]["DB_PASSWORD"]}",
+            "--wwwroot='https://${var.environment["moodle"]["HOST_NAME"]}'",
+            "--dataroot='/var/www/moodledata'",
+            "--dbtype='auroramysql'",
+            "--dbhost='${var.environment["moodle"]["DB_HOST"]}'",
+            "--dbname='moodle'",
+            "--dbuser='${var.environment["moodle"]["DB_USER"]}'",
+            "--dbpass='${var.environment["moodle"]["DB_PASSWORD"]}'",
             "--fullname='${var.environment["moodle"]["FULL_SITE_NAME"]}'",
             "--shortname='${var.environment["moodle"]["SHORT_SITE_NAME"]}'",
-            "--adminuser=admin",
-            "--adminpass=admin123",
+            "--adminuser='admin'",
+            "--adminpass='admin123'",
             "&& sed -i \"/$$CFG->directorypermissions = 0777;/a \\$$CFG->xsendfile = 'X-Accel-Redirect';\\n\\$$CFG->xsendfilealiases = array(\\n\\t'/dataroot/' => \\$$CFG->dataroot\\n);\" /var/www/html/moodle/config.php && chmod 0644 /var/www/html/moodle/config.php;",
             "else echo \"hello world\"; fi \n",
             "grep",

@@ -37,3 +37,4 @@ docker/cert-key.pem
 .terraform.lock.hcl
 *.zip
 .env*
+*.pem
