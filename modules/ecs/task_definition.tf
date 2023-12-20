@@ -1,7 +1,7 @@
 resource "aws_ecs_task_definition" "task_definition" {
-  # depends_on               = [aws_ecs_capacity_provider.this]
+  depends_on               = [aws_ecs_capacity_provider.this]
   family                   = "${var.name}-Definition"
-  requires_compatibilities = ["FARGATE"]
+  requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
   skip_destroy             = true
   container_definitions = jsonencode([

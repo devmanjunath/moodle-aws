@@ -86,18 +86,18 @@ module "efs" {
   security_group   = [module.network.allow_nfs_sg]
 }
 
-# module "asg" {
-#   depends_on = [module.network]
-#   source     = "./modules/asg"
-#   name       = var.project
-#   key_pair   = "MoodleManual"
-#   security_group = [
-#     module.network.allow_ssh_sg,
-#     module.network.allow_nfs_sg,
-#     module.network.allow_web_sg,
-#   ]
-#   subnets = module.network.private_subnets
-# }
+module "asg" {
+  depends_on = [module.network]
+  source     = "./modules/asg"
+  name       = var.project
+  key_pair   = "MoodleManual"
+  security_group = [
+    module.network.allow_ssh_sg,
+    module.network.allow_nfs_sg,
+    module.network.allow_web_sg,
+  ]
+  subnets = module.network.private_subnets
+}
 
 module "ecr" {
   depends_on     = [module.network]
@@ -114,7 +114,7 @@ locals {
       DB_PASSWORD    = module.rds.db_password
       DB_HOST        = module.rds.db_endpoint
       DB_USER        = module.rds.db_username
-      SKIP_BOOTSTRAP = "no" #module.rds.db_snapshot_exists ? "yes" : "no"
+      SKIP_BOOTSTRAP = module.rds.db_snapshot_exists ? "yes" : "no"
       SMTP_HOST      = "email-smtp.${var.region}.amazonaws.com"
       SMTP_PORT      = "25"
       SMTP_PASSWORD  = module.ses.smtp_password
@@ -134,7 +134,7 @@ module "ecs" {
   efs_access_point_arn = module.efs.access_point_arn
   efs_access_point_id  = module.efs.access_point_id
   target_group_arn     = module.load_balancer.target_group_arn
-  asg_arn              = "module.asg.autoscaling_group_arn"
+  asg_arn              = module.asg.autoscaling_group_arn
   moodle_image_uri     = module.ecr.moodle_image_uri
   subnets              = module.network.public_subnets
   efs_id               = module.efs.efs_id

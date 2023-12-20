@@ -18,6 +18,7 @@ services:
       context: ./moodle
     ports:
       - "443:443"
+      - "80:80"
     command: >
       bash -c "if [ 'no' = 'no' ]; then php /var/www/html/moodle/admin/cli/install.php --chmod=0777 --non-interactive --agree-license --wwwroot=http://localhost --dataroot=/var/www/moodledata --dbtype=mysqli --dbhost=mysql_db --dbname=moodle --dbuser=user --dbpass=root --fullname='Test Drive' --shortname='test-drive' --adminuser=admin --adminpass=admin123 && sed -i \"/$$CFG->directorypermissions = 0777;/a \\$$CFG->xsendfile = 'X-Accel-Redirect';\\n\\$$CFG->xsendfilealiases = array(\\n\\t'/dataroot/' => \\$$CFG->dataroot\\n);\" /var/www/html/moodle/config.php && chmod 0644 /var/www/html/moodle/config.php; fi && 
       grep -qe 'date.timezone = ${LOCAL_TIMEZONE}' /usr/local/etc/php/conf.d/security.ini || echo 'date.timezone = ${LOCAL_TIMEZONE}' >> /usr/local/etc/php/conf.d/security.ini;sh /etc/entrypoint.sh"
