@@ -2,7 +2,7 @@
 
 set -e
 
-while getopts s:h:t:d:a:f:p:y:q:e: flag
+while getopts s:h:t:d:a:f:p:y:q:e:c: flag
 do
     case "${flag}" in
         s) SKIP_BOOTSTRAP=${OPTARG};;
@@ -15,6 +15,7 @@ do
         y) SITE_NAME=${OPTARG};;
         q) ADMIN_USER=${OPTARG};;
         e) ADMIN_PASS=${OPTARG};;
+        c) CACHE_HOST=${OPTARG};;
     esac
 done
 
@@ -25,19 +26,22 @@ if [ "$SKIP_BOOTSTRAP" = "false" ]; then
   --agree-license \
   --wwwroot="https://$HOST" \
   --dataroot='/var/www/moodledata' \
-  --dbtype="$DB_TYPE" \
-  --dbhost="$DB_HOST" \
-  --dbname="$DB_NAME" \
-  --dbuser="$DB_USER" \
-  --dbpass="$DB_PASS" \
-  --fullname="$SITE_NAME" \
+  --dbtype=$DB_TYPE \
+  --dbhost=$DB_HOST \
+  --dbname=$DB_NAME \
+  --dbuser=$DB_USER \
+  --dbpass=$DB_PASS \
+  --fullname=$SITE_NAME \
   --shortname="${SITE_NAME,,}" \
-  --adminuser="$ADMIN_USER" \
-  --adminpass="$ADMIN_PASS" && \
+  --adminuser=$ADMIN_USER \
+  --adminpass=$ADMIN_PASS && \
   echo "\$CFG->directorypermissions = 0777;" >> /var/www/html/moodle/config.php; \
   echo "\$CFG->xsendfile = 'X-Accel-Redirect';" >> /var/www/html/moodle/config.php; \
   echo -e "\$CFG->xsendfilealiases = array(\n\t'/dataroot/' => \$CFG->dataroot\n);" >> /var/www/html/moodle/config.php; \
-  && chmod 0644 /var/www/html/moodle/config.php;
+  echo "\$CFG->session_handler_class = '\core\session\redis';" >> /var/www/html/moodle/config.php; \
+  echo "\$CFG->session_redis_host = '$CACHE_HOST';" >> /var/www/html/moodle/config.php; \
+  echo "\$CFG->session_redis_encrypt = ['verify_peer' => false, 'verify_peer_name' => false];" >> /var/www/html/moodle/config.php; \
+  chmod 0644 /var/www/html/moodle/config.php;
 else
   echo "Not Bootstrapping at the moment";
   mv /var/www/html/moodle/config_bak.php /var/www/html/moodle/config.php;

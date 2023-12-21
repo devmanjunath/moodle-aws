@@ -8,18 +8,27 @@ container_config = {
     portMappings = [{
       containerPort = 443
       hostPort      = 443
+      },
+      {
+        containerPort = 80
+        hostPort      = 80
     }]
   }
 }
 
 environment = {
   moodle = {
-    DB_TYPE         = "auroramysql"
-    HOST_NAME       = "cloudbreathe.in"
-    CACHE_HOST      = "something"
-    ADMIN_USER      = "user"
-    ADMIN_PASSWORD  = "bitnami"
-    FULL_SITE_NAME  = "Test Drive"
-    SHORT_SITE_NAME = "test-drive"
+    DB_TYPE        = "auroramysql"
+    HOST_NAME      = "cloudbreathe.in"
+    CACHE_HOST     = "something"
+    ADMIN_USER     = "user"
+    ADMIN_PASSWORD = "bitnami"
+    FULL_SITE_NAME = "Test Drive"
   }
+}
+
+ec2_config = {
+  image_id      = "ami-0345c0581a1b3637a"
+  instance_type = "m5.large"
+  users         = 300
 }

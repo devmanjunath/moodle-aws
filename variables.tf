@@ -7,6 +7,15 @@ variable "project" {
   default = "Test-Drive"
 }
 
+variable "ec2_config" {
+  type = object({
+    image_id      = string
+    instance_type = string
+    users         = number
+  })
+
+}
+
 variable "container_config" {
   type = object(
     { moodle = object({

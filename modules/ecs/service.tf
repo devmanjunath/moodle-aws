@@ -4,14 +4,12 @@ resource "aws_ecs_service" "this" {
   cluster                = aws_ecs_cluster.this.id
   task_definition        = aws_ecs_task_definition.task_definition.arn
   desired_count          = 1
-  force_new_deployment   = true
+  force_new_deployment   = false
   enable_execute_command = true
-  launch_type            = "EC2"
 
   network_configuration {
     security_groups = var.security_group
     subnets         = var.subnets
-    assign_public_ip = true
   }
 
   ordered_placement_strategy {

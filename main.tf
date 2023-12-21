@@ -87,14 +87,17 @@ module "efs" {
 }
 
 module "asg" {
-  depends_on = [module.network]
-  source     = "./modules/asg"
-  name       = var.project
-  key_pair   = "MoodleManual"
+  depends_on    = [module.network]
+  source        = "./modules/asg"
+  name          = var.project
+  image_id      = var.ec2_config["image_id"]
+  instance_type = var.ec2_config["instance_type"]
+  users         = var.ec2_config["users"]
   security_group = [
     module.network.allow_ssh_sg,
     module.network.allow_nfs_sg,
     module.network.allow_web_sg,
+    module.network.allow_mysql
   ]
   subnets = module.network.private_subnets
 }
@@ -114,10 +117,11 @@ locals {
       DB_PASSWORD    = module.rds.db_password
       DB_HOST        = module.rds.db_endpoint
       DB_USER        = module.rds.db_username
-      SKIP_BOOTSTRAP = module.rds.db_snapshot_exists ? "yes" : "no"
+      SKIP_BOOTSTRAP = module.rds.db_snapshot_exists ? true : false
       SMTP_HOST      = "email-smtp.${var.region}.amazonaws.com"
       SMTP_PORT      = "25"
       SMTP_PASSWORD  = module.ses.smtp_password
+      CACHE_HOST     = module.cache.cache_endpoint
     }
   ) }
 }
@@ -143,5 +147,6 @@ module "ecs" {
     module.network.allow_ssh_sg,
     module.network.allow_nfs_sg,
     module.network.allow_web_sg,
+    module.network.allow_mysql
   ]
 }

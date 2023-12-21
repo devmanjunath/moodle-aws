@@ -1,12 +1,11 @@
 resource "aws_launch_template" "this" {
   name_prefix   = "${lower(var.name)}-template"
-  image_id      = "ami-0345c0581a1b3637a"
-  instance_type = "m5.large"
+  image_id      = var.image_id
+  instance_type = var.instance_type
 
-  key_name               = var.key_pair
   vpc_security_group_ids = var.security_group
   iam_instance_profile {
-    name = "ecsInstanceRole"
+    name = aws_iam_instance_profile.ecs_instance_profile.name
   }
 
   block_device_mappings {
@@ -42,5 +41,9 @@ resource "aws_autoscaling_group" "this" {
     key                 = "AmazonECSManaged"
     value               = true
     propagate_at_launch = true
+  }
+
+  lifecycle {
+    ignore_changes = [ desired_capacity ]
   }
 }
