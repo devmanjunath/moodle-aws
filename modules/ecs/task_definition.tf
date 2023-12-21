@@ -19,32 +19,17 @@ resource "aws_ecs_task_definition" "task_definition" {
       command = [
         "/bin/sh",
         "-c",
-        join(
-          " ",
-          ["if [ '${var.environment["moodle"]["SKIP_BOOTSTRAP"]}' = 'no' ];",
-            "then php /var/www/html/moodle/admin/cli/install.php",
-            "--chmod=0777",
-            "--non-interactive",
-            "--agree-license",
-            "--wwwroot='https://${var.environment["moodle"]["HOST_NAME"]}'",
-            "--dataroot='/var/www/moodledata'",
-            "--dbtype='auroramysql'",
-            "--dbhost='${var.environment["moodle"]["DB_HOST"]}'",
-            "--dbname='moodle'",
-            "--dbuser='${var.environment["moodle"]["DB_USER"]}'",
-            "--dbpass='${var.environment["moodle"]["DB_PASSWORD"]}'",
-            "--fullname='${var.environment["moodle"]["FULL_SITE_NAME"]}'",
-            "--shortname='${var.environment["moodle"]["SHORT_SITE_NAME"]}'",
-            "--adminuser='admin'",
-            "--adminpass='admin123'",
-            "&& sed -i \"/$$CFG->directorypermissions = 0777;/a \\$$CFG->xsendfile = 'X-Accel-Redirect';\\n\\$$CFG->xsendfilealiases = array(\\n\\t'/dataroot/' => \\$$CFG->dataroot\\n);\" /var/www/html/moodle/config.php && chmod 0644 /var/www/html/moodle/config.php;",
-            "else echo \"hello world\"; fi \n",
-            "grep",
-            "-qe",
-            "'date.timezone = local_timezone'",
-            "/usr/local/etc/php/conf.d/security.ini",
-            "|| echo 'date.timezone = local_timezone' >> /usr/local/etc/php/conf.d/security.ini; sh /etc/entrypoint.sh"
-        ])
+        "/opt/entrypoint.sh",
+        "-s true",
+        "-h '${var.environment["moodle"]["HOST_NAME"]}'",
+        "-t 'auroramysql'",
+        "-d '${var.environment["moodle"]["DB_HOST"]}''",
+        "-a 'moodle'",
+        "-f '${var.environment["moodle"]["DB_USER"]}'",
+        "-p '${var.environment["moodle"]["DB_PASSWORD"]}'",
+        "-y '${var.environment["moodle"]["FULL_SITE_NAME"]}'",
+        "-q '${var.environment["moodle"]["ADMIN_USER"]}'",
+        "-e '${var.environment["moodle"]["ADMIN_PASSWORD"]}'"
       ]
       mountPoints = [
         {

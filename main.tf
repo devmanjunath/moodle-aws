@@ -123,7 +123,7 @@ locals {
 }
 
 module "ecs" {
-  depends_on           = [module.ses, module.efs, module.rds, module.cache, module.load_balancer, #module.asg, 
+  depends_on = [module.ses, module.efs, module.rds, module.cache, module.load_balancer, #module.asg, 
   module.ecr]
   source               = "./modules/ecs"
   name                 = var.project
@@ -136,7 +136,7 @@ module "ecs" {
   target_group_arn     = module.load_balancer.target_group_arn
   asg_arn              = module.asg.autoscaling_group_arn
   moodle_image_uri     = module.ecr.moodle_image_uri
-  subnets              = module.network.public_subnets
+  subnets              = module.network.private_subnets
   efs_id               = module.efs.efs_id
   environment          = merge(local.updated_moodle_environment)
   security_group = [

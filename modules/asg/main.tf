@@ -1,7 +1,7 @@
 resource "aws_launch_template" "this" {
   name_prefix   = "${lower(var.name)}-template"
   image_id      = "ami-0345c0581a1b3637a"
-  instance_type = "t3.large"
+  instance_type = "m5.large"
 
   key_name               = var.key_pair
   vpc_security_group_ids = var.security_group
