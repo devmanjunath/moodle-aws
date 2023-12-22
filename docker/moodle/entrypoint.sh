@@ -55,6 +55,8 @@ while [[ "$#" -gt 0 ]]; do
   esac
 done
 
+echo "----$db_host---"
+
 if [ ! "$skip_bootstrap" ]; then
   php /var/www/html/moodle/admin/cli/install.php \
   --chmod=0777 \
@@ -70,12 +72,13 @@ if [ ! "$skip_bootstrap" ]; then
   --fullname="$site_name" \
   --shortname="${site_name,,}" \
   --adminuser=$admin_user \
-  --adminpass=$admin_pass && \
+  --adminpass=$admin_pass; \
   echo "\$CFG->directorypermissions = 0777;" >> /var/www/html/moodle/config.php; \
   echo "\$CFG->xsendfile = 'X-Accel-Redirect';" >> /var/www/html/moodle/config.php; \
   echo -e "\$CFG->xsendfilealiases = array(\n\t'/dataroot/' => \$CFG->dataroot\n);" >> /var/www/html/moodle/config.php; \
   echo "\$CFG->session_handler_class = '\core\session\redis';" >> /var/www/html/moodle/config.php; \
   echo "\$CFG->session_redis_encrypt = ['verify_peer' => false, 'verify_peer_name' => false];" >> /var/www/html/moodle/config.php; \
+else
   echo "Not Bootstrapping at the moment";
   mv /var/www/html/moodle/config_bak.php /var/www/html/moodle/config.php;
 fi

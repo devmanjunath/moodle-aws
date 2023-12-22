@@ -20,7 +20,6 @@ resource "aws_ecs_task_definition" "task_definition" {
         "/bin/sh",
         "-c",
         "/opt/entrypoint.sh",
-        "--skip-bootstrap",
         "--host-name '${var.environment["moodle"]["HOST_NAME"]}'",
         "--db-type 'auroramysql'",
         "--db-host '${var.environment["moodle"]["DB_HOST"]}'",
