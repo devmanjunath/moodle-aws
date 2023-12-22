@@ -62,7 +62,7 @@ module "rds" {
   source  = "./modules/rds"
   name    = var.project
   vpc_id  = module.network.vpc_id
-  subnets = module.network.private_subnets
+  subnets = module.network.public_subnets
   security_group = [
     module.network.allow_mysql
   ]
@@ -72,7 +72,7 @@ module "cache" {
   depends_on = [module.network]
   source     = "./modules/cache"
   name       = var.project
-  subnets    = module.network.private_subnets
+  subnets    = module.network.public_subnets
   security_group = [
     module.network.allow_redis,
   ]
@@ -82,7 +82,7 @@ module "efs" {
   depends_on       = [module.network]
   source           = "./modules/efs"
   name             = var.project
-  subnets_to_mount = module.network.private_subnets
+  subnets_to_mount = module.network.public_subnets
   security_group   = [module.network.allow_nfs_sg]
 }
 
@@ -99,7 +99,7 @@ module "asg" {
     module.network.allow_web_sg,
     module.network.allow_mysql
   ]
-  subnets = module.network.private_subnets
+  subnets = module.network.public_subnets
 }
 
 module "ecr" {
@@ -140,7 +140,7 @@ module "ecs" {
   target_group_arn     = module.load_balancer.target_group_arn
   asg_arn              = module.asg.autoscaling_group_arn
   moodle_image_uri     = module.ecr.moodle_image_uri
-  subnets              = module.network.private_subnets
+  subnets              = module.network.public_subnets
   efs_id               = module.efs.efs_id
   environment          = merge(local.updated_moodle_environment)
   security_group = [

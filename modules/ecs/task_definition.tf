@@ -20,16 +20,16 @@ resource "aws_ecs_task_definition" "task_definition" {
         "/bin/sh",
         "-c",
         "/opt/entrypoint.sh",
-        "-s true",
-        "-h '${var.environment["moodle"]["HOST_NAME"]}'",
-        "-t auroramysql",
-        "-d '${var.environment["moodle"]["DB_HOST"]}'",
-        "-a 'moodle'",
-        "-f '${var.environment["moodle"]["DB_USER"]}'",
-        "-p '${var.environment["moodle"]["DB_PASSWORD"]}'",
-        "-y '${var.environment["moodle"]["FULL_SITE_NAME"]}'",
-        "-q '${var.environment["moodle"]["ADMIN_USER"]}'",
-        "-e '${var.environment["moodle"]["ADMIN_PASSWORD"]}'"
+        "--skip-bootstrap",
+        "--host-name '${var.environment["moodle"]["HOST_NAME"]}'",
+        "--db-type 'auroramysql'",
+        "--db-host '${var.environment["moodle"]["DB_HOST"]}'",
+        "--db-name 'moodle'",
+        "--db-user '${var.environment["moodle"]["DB_USER"]}'",
+        "--db-password '${var.environment["moodle"]["DB_PASSWORD"]}'",
+        "--site-name '${var.environment["moodle"]["FULL_SITE_NAME"]}'",
+        "--admin-user '${var.environment["moodle"]["ADMIN_USER"]}'",
+        "--admin-pass '${var.environment["moodle"]["ADMIN_PASSWORD"]}'"
       ]
       mountPoints = [
         {
