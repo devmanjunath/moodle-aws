@@ -1,11 +1,6 @@
-resource "aws_cloudwatch_event_bus" "this" {
-  name = "${lower(var.name)}-event-bus"
-}
-
 resource "aws_cloudwatch_event_rule" "this" {
-  name           = "${lower(var.name)}-event-bus"
+  name           = "${lower(var.name)}-event"
   description    = "Capture each AWS Console Sign In"
-  event_bus_name = aws_cloudwatch_event_bus.this.name
 
   event_pattern = jsonencode({
     "source" : ["aws.ecs"],
@@ -18,7 +13,6 @@ resource "aws_cloudwatch_event_rule" "this" {
 
 resource "aws_cloudwatch_event_target" "this" {
   rule           = aws_cloudwatch_event_rule.this.name
-  event_bus_name = aws_cloudwatch_event_bus.this.name
   target_id      = "SendToLambda"
   arn            = module.ecs_lambda.lambda_function_arn
 }

@@ -63,7 +63,7 @@ if [ ! "$skip_bootstrap" ]; then
   --non-interactive \
   --agree-license \
   --wwwroot="https://$host_name" \
-  --dataroot='/var/www/moodledata' \
+  --dataroot='/var/moodledata' \
   --dbtype="$db_type" \
   --dbhost="$db_host" \
   --dbname="$db_name" \
@@ -83,7 +83,8 @@ else
   mv /var/www/html/moodle/config_bak.php /var/www/html/moodle/config.php;
 fi
 
-grep -qe "date.timezone = \${LOCAL_TIMEZONE}" /usr/local/etc/php/conf.d/security.ini || echo "date.timezone = \${LOCAL_TIMEZONE}" >> /usr/local/etc/php/conf.d/security.ini;
+grep -qe "date.timezone = local_timezone" /usr/local/etc/php/conf.d/security.ini || echo "date.timezone = local_timezone" >> /usr/local/etc/php/conf.d/security.ini;
 
+chown -R www-data /var/moodledata && chmod -R 777 /var/moodledata && chmod -R 0755 /var/www/html/moodle && \
 php-fpm -D
 nginx -g 'daemon off;'

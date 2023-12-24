@@ -20,4 +20,4 @@ services:
       - "443:443"
       - "80:80"
     command: >
-      bash -c "/opt/entrypoint.sh --host-name 'cloudbreathe.in' --db-type 'mysqli' --db-host mysql_db --db-name moodle --db-user 'user' --db-pass 'root' --site-name 'Test Drive' --admin-user 'admin' --admin-pass 'admin123'"
+      /bin/bash -c "/opt/entrypoint.sh --host-name 'localhost' --db-type "mysqli" --db-host mysql_db --db-name moodle --db-user 'user' --db-pass 'root' --site-name 'Test Drive' --admin-user 'admin' --admin-pass 'admin123'"
