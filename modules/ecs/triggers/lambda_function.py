@@ -1,5 +1,6 @@
 import boto3
 import os
+from datetime import datetime, timedelta
 
 def update_ecs_service(cluster_name, service_name, commands=[]):
     ecs_client = boto3.client("ecs")
@@ -25,7 +26,8 @@ def update_ecs_service(cluster_name, service_name, commands=[]):
     ecs_client.update_service(
         cluster=cluster_name,
         service=service_name,
-        taskDefinition=new_task_definition['taskDefinition']['family']
+        taskDefinition=new_task_definition['taskDefinition']['family'],
+        forceNewDeployment=True
     )
 
 def get_update_command():
@@ -61,9 +63,15 @@ def lambda_handler(event, _):
     print(f"Events coming from {cluster_name}:\n")
     print(event)
 
-    if event["detail"]["lastStatus"] == "PROVISIONING" and len(event["detail"]["containers"]) == 0:
-        update_ecs_service(cluster_name, service_name, get_update_command())
-        print("ECS service updated with new environment variables")
+    if event["detail"]["lastStatus"] == "RUNNING" and len(event["detail"]["containers"]) == 1:
+        last_updated = datetime.strptime(event["detail"]["updatedAt"], '%Y-%m-%d %H:%M:%S')
+        ten_minutes_ago = last_updated + timedelta(minutes=10)
+        current_time = datetime.now()
+        if ten_minutes_ago <= current_time:
+            update_ecs_service(cluster_name, service_name, get_update_command())
+            print("ECS service updated with new environment variables")
+        else:
+            print("Running Tasks not yet stable")
     else:
         print("ECS service need not be updated at the moment")
         print(event["detail"]["lastStatus"])

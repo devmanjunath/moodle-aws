@@ -2,7 +2,7 @@ resource "aws_ecs_service" "this" {
   depends_on             = [aws_ecs_task_definition.task_definition, aws_ecs_cluster.this]
   name                   = lower("${var.name}-service")
   cluster                = aws_ecs_cluster.this.id
-  task_definition        = aws_ecs_task_definition.task_definition.arn
+  task_definition        = "${aws_ecs_task_definition.task_definition.arn_without_revision}"
   desired_count          = 1
   force_new_deployment   = false
   enable_execute_command = true

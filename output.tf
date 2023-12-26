@@ -6,7 +6,7 @@ output "db_username" {
   value = module.rds.db_username
 }
 
-output "cache_endpoint" {
+output "cache_host" {
   value = module.cache.cache_endpoint
 }
 
