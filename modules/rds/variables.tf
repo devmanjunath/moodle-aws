@@ -18,3 +18,11 @@ variable "subnets" {
 variable "security_group" {
   type = list(string)
 }
+
+variable "instance_type" {
+  type = string
+}
+
+variable "storage" {
+  type = string
+}

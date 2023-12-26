@@ -1,10 +1,22 @@
-resource "aws_rds_cluster_instance" "cluster_instances" {
-  identifier = lower("${var.name}-instance")
+resource "random_password" "DatabaseMasterPassword" {
+  length           = 16
+  special          = true
+  override_special = "!#$%^*()-=+_?{}|"
+}
 
-  cluster_identifier   = aws_rds_cluster.aurora_serverless.id
-  engine               = aws_rds_cluster.aurora_serverless.engine
-  engine_version       = aws_rds_cluster.aurora_serverless.engine_version
-  instance_class       = "db.serverless"
-  publicly_accessible  = true
-  db_subnet_group_name = aws_db_subnet_group.default.id
+
+resource "aws_db_instance" "this" {
+  engine                    = "mysql"
+  identifier                = lower(var.name)
+  allocated_storage         = var.storage
+  engine_version            = "8.0.35"
+  instance_class            = var.instance_type
+  username                  = "admin"
+  db_subnet_group_name      = aws_db_subnet_group.default.id
+  password                  = random_password.DatabaseMasterPassword.result
+  vpc_security_group_ids    = var.security_group
+  skip_final_snapshot       = false
+  publicly_accessible       = false
+  db_name                   = "moodle"
+  final_snapshot_identifier = "${var.name}-snapshot-${formatdate("YYYYMMDDhhmmss", timestamp())}"
 }

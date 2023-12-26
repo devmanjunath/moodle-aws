@@ -1,6 +1,6 @@
 resource "aws_iam_role" "this" {
-  name = "role-for-${lower(var.name)}-trigger"
-
+  name                = "role-for-${lower(var.name)}-trigger"
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"]
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -31,6 +31,13 @@ data "aws_iam_policy_document" "this" {
     ]
 
     resources = ["*"]
+  }
+
+  statement {
+    sid       = "passRole"
+    effect    = "Allow"
+    actions   = ["iam:PassRole"]
+    resources = [var.pass_role]
   }
 }
 

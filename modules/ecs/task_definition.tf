@@ -1,9 +1,9 @@
 resource "aws_ecs_task_definition" "task_definition" {
   depends_on               = [aws_ecs_capacity_provider.this]
-  family                   = "${var.name}-Definition"
+  family                   = "${var.name}"
   requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
-  skip_destroy             = true
+  skip_destroy             = false
   container_definitions = jsonencode([
     {
       cpu          = var.container_config["moodle"]["cpu"]
@@ -22,9 +22,8 @@ resource "aws_ecs_task_definition" "task_definition" {
         join(" ", [
           "/opt/entrypoint.sh",
           "--host-name '${var.environment["moodle"]["HOST_NAME"]}'",
-          "--db-type auroramysql",
+          "--db-type mysqli",
           "--db-host '${var.environment["moodle"]["DB_HOST"]}'",
-          "--db-name moodle",
           "--db-user '${var.environment["moodle"]["DB_USER"]}'",
           "--db-pass '${var.environment["moodle"]["DB_PASSWORD"]}'",
           "--site-name '${var.environment["moodle"]["FULL_SITE_NAME"]}'",

@@ -14,8 +14,8 @@ module "ecs_lambda" {
   handler                           = "lambda_function.lambda_handler"
   lambda_role                       = aws_iam_role.this.arn
   use_existing_cloudwatch_log_group = true
-  environment_variables = {
+  environment_variables = merge({
     CLUSTER_NAME = var.cluster_name
     SERVICE_NAME = lower("${var.name}-service")
-  }
+  }, var.environment)
 }

@@ -1,56 +1,7 @@
-resource "aws_security_group" "allow_ssh" {
-  name        = "vpc-ssh"
-  description = "Allow SSH"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    description = "Allow Port 22"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Allow Ping"
-    from_port   = 8
-    to_port     = 0
-    protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Allow Port 22"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "Allow SSH"
-  }
-}
-
 resource "aws_security_group" "allow_web" {
   name        = "vpc-web"
   description = "Allow web raffic"
   vpc_id      = aws_vpc.main.id
-
-  ingress {
-    description = "Allow Port 8080"
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   ingress {
     description = "Allow Port 443"

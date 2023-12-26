@@ -1,10 +1,11 @@
 resource "aws_iam_role" "this" {
-  name = "ecs2InstanceRole"
-
+  name = "ecsInstanceRole"
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"]
   assume_role_policy = jsonencode({
     Version = "2008-10-17"
     Statement = [
       {
+        Sid    = "",
         Action = "sts:AssumeRole"
         Effect = "Allow"
         Principal = {
@@ -13,12 +14,6 @@ resource "aws_iam_role" "this" {
       },
     ]
   })
-}
-
-resource "aws_iam_policy_attachment" "service_role" {
-  name       = "ecs-ec2-service-role-attachment"
-  roles      = [aws_iam_role.this.name]
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
 resource "aws_iam_instance_profile" "ecs_instance_profile" {

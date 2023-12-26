@@ -2,7 +2,7 @@
 FROM php:8.0.27-fpm
 
 ## Update OS with base libraries & install nginx
-RUN apt update -y && apt install -y nginx-full libpcre3-dev git nano
+RUN apt update -y && apt install -y nginx-full libpcre3-dev git nano default-mysql-client
 
 ## Create folder for the moodledata and for mounting EFS volume
 RUN mkdir /var/www/html/moodle && mkdir /var/moodledata

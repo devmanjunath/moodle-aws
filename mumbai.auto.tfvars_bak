@@ -18,7 +18,7 @@ container_config = {
 
 environment = {
   moodle = {
-    DB_TYPE        = "auroramysql"
+    DB_TYPE        = "mysqli"
     HOST_NAME      = "cloudbreathe.in"
     CACHE_HOST     = "something"
     ADMIN_USER     = "user"
@@ -27,8 +27,13 @@ environment = {
   }
 }
 
+rds_config = {
+  instance_type = "db.m7g.large"
+  storage       = 30
+}
+
 ec2_config = {
   image_id      = "ami-0345c0581a1b3637a"
-  instance_type = "t3.medium"
+  instance_type = "m5.large"
   users         = 300
 }

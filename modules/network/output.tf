@@ -14,10 +14,6 @@ output "private_subnets" {
   value = [for subnet in aws_subnet.private_subnets : subnet.id]
 }
 
-output "allow_ssh_sg" {
-  value = aws_security_group.allow_ssh.id
-}
-
 output "allow_web_sg" {
   value = aws_security_group.allow_web.id
 }

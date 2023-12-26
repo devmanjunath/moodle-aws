@@ -7,6 +7,13 @@ variable "project" {
   default = "Test-Drive"
 }
 
+variable "rds_config" {
+  type = object({
+    instance_type = string
+    storage       = number
+  })
+}
+
 variable "ec2_config" {
   type = object({
     image_id      = string

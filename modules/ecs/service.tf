@@ -1,5 +1,5 @@
 resource "aws_ecs_service" "this" {
-  depends_on             = [aws_ecs_task_definition.task_definition]
+  depends_on             = [aws_ecs_task_definition.task_definition, aws_ecs_cluster.this]
   name                   = lower("${var.name}-service")
   cluster                = aws_ecs_cluster.this.id
   task_definition        = aws_ecs_task_definition.task_definition.arn

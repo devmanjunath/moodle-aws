@@ -12,12 +12,20 @@ services:
       MYSQL_DATABASE: moodle
       MYSQL_USER: user
       MYSQL_PASSWORD: root
-  moodle:
+    ports:
+      - "3306:3306"
+  cache_db:
     depends_on: [mysql_db]
+    image: redis
+    ports:
+      - '6379:6379'
+  moodle:
+    depends_on: [mysql_db, cache_db]
+    container_name: moodle
     build:
       context: ./moodle
     ports:
       - "443:443"
       - "80:80"
     command: >
-      /bin/bash -c "/opt/entrypoint.sh --host-name 'localhost' --db-type "mysqli" --db-host mysql_db --db-name moodle --db-user 'user' --db-pass 'root' --site-name 'Test Drive' --admin-user 'admin' --admin-pass 'admin123'"
+      /bin/bash -c "/opt/entrypoint.sh --host-name 'localhost' --db-type "mysqli" --db-host mysql_db --db-user 'user' --db-pass 'root' --site-name 'Test Drive' --admin-user 'admin' --admin-pass 'admin123' --cache-host docker-cache_db-1"
