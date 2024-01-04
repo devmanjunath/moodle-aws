@@ -43,10 +43,10 @@ RUN php /var/www/html/moodle/admin/cli/install.php \
   --wwwroot="https://$host_name" \
   --dataroot='/var/moodledata' \
   --dbtype="mysqli" \
-  --dbhost=$db_host \
+  --dbhost="$db_host" \
   --dbname="moodle" \
-  --dbuser=$db_user \
-  --dbpass=$db_pass \
+  --dbuser="$db_user" \
+  --dbpass="$db_pass" \
   --fullname="$site_name" \
   --shortname="$short_site_name" \
   --adminuser="$admin_user" \
@@ -54,13 +54,15 @@ RUN php /var/www/html/moodle/admin/cli/install.php \
 
 RUN echo "\$CFG->directorypermissions = 0777;" >> /var/www/html/moodle/config.php;
 RUN echo "\$CFG->xsendfile = 'X-Accel-Redirect';" >> /var/www/html/moodle/config.php;
-RUN echo -e "\$CFG->xsendfilealiases = array(\n\t'/dataroot/' => \$CFG->dataroot\n);" >> /var/www/html/moodle/config.php;
+RUN echo "\$CFG->xsendfilealiases = array(\n\t'/dataroot/' => \$CFG->dataroot\n);" >> /var/www/html/moodle/config.php;
 RUN echo "\$CFG->tool_generator_users_password = 'moodle';" >> /var/www/html/moodle/config.php;
 
 RUN grep -qe "date.timezone = local_timezone" /usr/local/etc/php/conf.d/security.ini || echo "date.timezone = local_timezone" >> /usr/local/etc/php/conf.d/security.ini;
 
 RUN chown -R www-data:www-data /var/moodledata && chmod -R 777 /var/moodledata && chmod -R 0755 /var/www/html/moodle
 
-ENTRYPOINT ["install.sh"]
+RUN chmod +x install.sh
+
+ENTRYPOINT ["bash", "./install.sh"]
 
 EXPOSE 80 443

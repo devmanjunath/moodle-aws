@@ -1,6 +1,6 @@
 resource "aws_ecs_task_definition" "task_definition" {
   depends_on               = [aws_ecs_capacity_provider.this]
-  family                   = "${var.name}"
+  family                   = var.name
   requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
   skip_destroy             = false
@@ -10,27 +10,6 @@ resource "aws_ecs_task_definition" "task_definition" {
       memory       = var.container_config["moodle"]["memory"]
       portMappings = var.container_config["moodle"]["portMappings"]
       essential    = true
-      environment = [
-        for key, value in var.environment["moodle"] : {
-          name  = key
-          value = value
-        }
-      ]
-      command = [
-        "/bin/bash",
-        "-c",
-        join(" ", [
-          "/opt/entrypoint.sh",
-          "--host-name '${var.environment["moodle"]["HOST_NAME"]}'",
-          "--db-type mysqli",
-          "--db-host '${var.environment["moodle"]["DB_HOST"]}'",
-          "--db-user '${var.environment["moodle"]["DB_USER"]}'",
-          "--db-pass '${var.environment["moodle"]["DB_PASSWORD"]}'",
-          "--site-name '${var.environment["moodle"]["FULL_SITE_NAME"]}'",
-          "--admin-user '${var.environment["moodle"]["ADMIN_USER"]}'",
-          "--admin-pass '${var.environment["moodle"]["ADMIN_PASSWORD"]}'"
-        ])
-      ]
       mountPoints = [
         {
           containerPath = "/var/moodledata",

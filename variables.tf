@@ -39,8 +39,6 @@ variable "container_config" {
   })
 }
 
-variable "environment" {
-  type = object({
-    moodle = map(string)
-  })
+variable "ecs_environment" {
+  type = map(string)
 }

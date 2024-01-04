@@ -49,9 +49,3 @@ variable "asg_arn" {
 variable "moodle_image_uri" {
   type = string
 }
-
-variable "environment" {
-  type = object({
-    moodle = map(string)
-  })
-}

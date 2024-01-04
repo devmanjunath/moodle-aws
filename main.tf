@@ -61,15 +61,16 @@ module "ses" {
 }
 
 module "rds" {
-  source  = "./modules/rds"
-  name    = var.project
-  vpc_id  = module.network.vpc_id
-  subnets = module.network.private_subnets
+  depends_on = [module.network]
+  source     = "./modules/rds"
+  name       = var.project
+  vpc_id     = module.network.vpc_id
+  subnets    = module.network.private_subnets
   security_group = [
     module.network.allow_mysql
   ]
   instance_type = var.rds_config["instance_type"]
-  storage = var.rds_config["storage"]
+  storage       = var.rds_config["storage"]
 }
 
 module "cache" {
@@ -106,27 +107,21 @@ module "asg" {
 }
 
 module "ecr" {
-  depends_on     = [module.network]
-  source         = "./modules/ecr"
-  name           = var.project
-  region         = var.region
-  image_to_build = ["moodle"]
-}
-
-locals {
-  updated_moodle_environment = { moodle = merge(var.environment["moodle"],
+  depends_on = [module.network]
+  source     = "./modules/ecr"
+  name       = var.project
+  region     = var.region
+  environment = merge(var.ecs_environment,
     {
       CONTAINER_NAME = "cloudbreathe.in"
-      DB_PASSWORD    = module.rds.db_password
+      DB_PASS        = module.rds.db_password
       DB_HOST        = module.rds.db_endpoint
       DB_USER        = module.rds.db_username
-      SKIP_BOOTSTRAP = module.rds.db_snapshot_exists ? true : false
       SMTP_HOST      = "email-smtp.${var.region}.amazonaws.com"
       SMTP_PORT      = "25"
       SMTP_PASSWORD  = module.ses.smtp_password
-      CACHE_HOST     = module.cache.cache_endpoint
     }
-  ) }
+  )
 }
 
 module "ecs" {
@@ -145,7 +140,6 @@ module "ecs" {
   moodle_image_uri     = module.ecr.moodle_image_uri
   subnets              = module.network.private_subnets
   efs_id               = module.efs.efs_id
-  environment          = merge(local.updated_moodle_environment)
   security_group = [
     module.network.allow_nfs_sg,
     module.network.allow_web_sg,
