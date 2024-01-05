@@ -34,27 +34,27 @@ module "cicd" {
   name   = var.project
   environment_variables = [
     {
-      name  = "region",
+      name  = "TF_VAR_region",
       value = var.region
       type  = "PLAINTEXT"
     },
     {
-      name  = "rds_config",
+      name  = "TF_VAR_rds_config",
       value = aws_ssm_parameter.rds_config.name
       type  = "PARAMETER_STORE"
     },
     {
-      name  = "ec2_config",
+      name  = "TF_VAR_ec2_config",
       value = aws_ssm_parameter.ec2_config.name
       type  = "PARAMETER_STORE"
     },
     {
-      name  = "ecs_environment",
+      name  = "TF_VAR_ecs_environment",
       value = aws_ssm_parameter.ecs_environment.name
       type  = "PARAMETER_STORE"
     },
     {
-      name  = "container_config",
+      name  = "TF_VAR_container_config",
       value = aws_ssm_parameter.container_config.name
       type  = "PARAMETER_STORE"
     }
