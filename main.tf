@@ -29,6 +29,43 @@ module "network" {
   private_subnets = local.private_subnets
 }
 
+module "cicd" {
+  source = "./modules/cicd"
+  name   = var.project
+  environment_variables = [
+    {
+      name  = "region",
+      value = var.region
+      type  = "PLAINTEXT"
+    },
+    {
+      name  = "rds_config",
+      value = aws_ssm_parameter.rds_config.name
+      type  = "PARAMETER_STORE"
+    },
+    {
+      name  = "ec2_config",
+      value = aws_ssm_parameter.ec2_config.name
+      type  = "PARAMETER_STORE"
+    },
+    {
+      name  = "ecs_environment",
+      value = aws_ssm_parameter.ecs_environment.name
+      type  = "PARAMETER_STORE"
+    },
+    {
+      name  = "container_config",
+      value = aws_ssm_parameter.container_config.name
+      type  = "PARAMETER_STORE"
+    }
+  ]
+  vpc_id  = module.network.vpc_id
+  subnets = module.network.private_subnets
+  security_groups = [
+    module.network.allow_web_sg
+  ]
+}
+
 module "acm" {
   source      = "./modules/acm"
   domain_name = "cloudbreathe.in"
