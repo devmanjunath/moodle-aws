@@ -26,3 +26,15 @@ variable "instance_type" {
 variable "storage" {
   type = string
 }
+
+variable "publicly_accessible" {
+  type = bool
+}
+
+variable "zone_id" {
+  type = string
+}
+
+variable "domain_name" {
+  type = string
+}

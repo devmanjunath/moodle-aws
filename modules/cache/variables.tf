@@ -14,3 +14,16 @@ variable "subnets" {
 variable "security_group" {
   type = list(string)
 }
+
+variable "instance_type" {
+  type    = string
+  default = "cache.t3.medium"
+}
+
+variable "zone_id" {
+  type = string
+}
+
+variable "domain_name" {
+  type = string
+}

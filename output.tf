@@ -13,3 +13,8 @@ output "cache_host" {
 output "lb_dns_name" {
   value = module.load_balancer.dns_name
 }
+
+output "db_password" {
+  value     = module.rds.db_password
+  sensitive = true
+}

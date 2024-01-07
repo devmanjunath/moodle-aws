@@ -1,31 +1,6 @@
-region  = "ap-south-1"
-project = "Test-Drive"
-container_config = {
-  moodle = {
-    cpu    = 2048
-    memory = 4096
-    name   = "moodle"
-    portMappings = [{
-      containerPort = 443
-      hostPort      = 443
-      },
-      {
-        containerPort = 80
-        hostPort      = 80
-    }]
-  }
-}
-
-environment = {
-  moodle = {
-    DB_TYPE        = "mysqli"
-    HOST_NAME      = "cloudbreathe.in"
-    CACHE_HOST     = "something"
-    ADMIN_USER     = "user"
-    ADMIN_PASSWORD = "bitnami"
-    FULL_SITE_NAME = "Test Drive"
-  }
-}
+region      = "ap-south-1"
+project     = "Test-Drive"
+environment = "dev"
 
 rds_config = {
   instance_type = "db.m7g.large"
@@ -36,4 +11,9 @@ ec2_config = {
   image_id      = "ami-0345c0581a1b3637a"
   instance_type = "m5.large"
   users         = 300
+  key_name      = "test-drive"
+}
+
+cache_config = {
+  instance_type = "cache.t3.medium"
 }

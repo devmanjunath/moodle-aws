@@ -2,12 +2,28 @@ variable "name" {
   type = string
 }
 
+variable "region" {
+  type = string
+}
+
+variable "zone_id" {
+  type = string
+}
+
+variable "domain_name" {
+  type = string
+}
+
 variable "subnets" {
   type = list(string)
 }
 
 variable "security_group" {
   type = list(string)
+}
+
+variable "key_name" {
+  type = string
 }
 
 variable "image_id" {
@@ -20,7 +36,11 @@ variable "instance_type" {
   default = "m5.large"
 }
 
-variable "users" {
+variable "instance_count" {
   type    = number
   default = "300"
+}
+
+variable "environment" {
+  type = string
 }

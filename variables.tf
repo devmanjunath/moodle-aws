@@ -7,6 +7,15 @@ variable "project" {
   default = "Test-Drive"
 }
 
+variable "environment" {
+  type    = string
+  default = "dev"
+  validation {
+    condition     = var.environment == "dev" || var.environment == "prod"
+    error_message = "The environment must either be dev or prod"
+  }
+}
+
 variable "rds_config" {
   type = object({
     instance_type = string
@@ -19,26 +28,12 @@ variable "ec2_config" {
     image_id      = string
     instance_type = string
     users         = number
-  })
-
-}
-
-variable "container_config" {
-  type = object(
-    { moodle = object({
-      name   = string
-      cpu    = number
-      memory = number
-      portMappings = list(
-        object({
-          containerPort = number
-          hostPort      = number
-        })
-      )
-      })
+    key_name      = string
   })
 }
 
-variable "ecs_environment" {
-  type = map(string)
+variable "cache_config" {
+  type = object({
+    instance_type = string
+  })
 }

@@ -7,6 +7,10 @@ variable "description" {
   default = "VPC Created By Terraform"
 }
 
+variable "environment" {
+  type = string
+}
+
 variable "public_subnets" {
   type        = map(any)
   description = "No of public subnets to be created"

@@ -3,12 +3,15 @@ resource "aws_security_group" "allow_web" {
   description = "Allow web raffic"
   vpc_id      = aws_vpc.main.id
 
-  ingress {
-    description = "Allow Port 443"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  dynamic "ingress" {
+    for_each = var.environment == "dev" ? [0] : []
+    content {
+      description = "Allow SSH"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   }
 
   ingress {
@@ -36,31 +39,6 @@ resource "aws_security_group" "allow_web" {
 
   tags = {
     Name = "Allow Web"
-  }
-}
-
-resource "aws_security_group" "allow_nfs" {
-  name        = "EFS-Access"
-  description = "Allow for EFS Connectivity"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    description = "Allow NFS"
-    from_port   = 2049
-    to_port     = 2049
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "EFS-Access"
   }
 }
 

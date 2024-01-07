@@ -24,46 +24,10 @@ locals {
 module "network" {
   source          = "./modules/network"
   name            = var.project
+  environment     = var.environment
   description     = "VPC For Test Drive Powered By Moodle"
   public_subnets  = local.public_subnets
   private_subnets = local.private_subnets
-}
-
-module "cicd" {
-  source = "./modules/cicd"
-  name   = var.project
-  environment_variables = [
-    {
-      name  = "TF_VAR_region",
-      value = var.region
-      type  = "PLAINTEXT"
-    },
-    {
-      name  = "TF_VAR_rds_config",
-      value = aws_ssm_parameter.rds_config.name
-      type  = "PARAMETER_STORE"
-    },
-    {
-      name  = "TF_VAR_ec2_config",
-      value = aws_ssm_parameter.ec2_config.name
-      type  = "PARAMETER_STORE"
-    },
-    {
-      name  = "TF_VAR_ecs_environment",
-      value = aws_ssm_parameter.ecs_environment.name
-      type  = "PARAMETER_STORE"
-    },
-    {
-      name  = "TF_VAR_container_config",
-      value = aws_ssm_parameter.container_config.name
-      type  = "PARAMETER_STORE"
-    }
-  ]
-  vpc_id  = module.network.vpc_id
-  subnets = module.network.private_subnets
-  security_groups = [
-    module.network.allow_web_sg
-  ]
 }
 
 module "acm" {
@@ -98,88 +62,49 @@ module "ses" {
 }
 
 module "rds" {
-  depends_on = [module.network]
-  source     = "./modules/rds"
-  name       = var.project
-  vpc_id     = module.network.vpc_id
-  subnets    = module.network.private_subnets
+  source              = "./modules/rds"
+  name                = var.project
+  vpc_id              = module.network.vpc_id
+  zone_id             = module.route53.zone_id
+  domain_name         = "db.cloudbreathe.in"
+  publicly_accessible = var.environment == "dev" ? true : false
+  subnets             = var.environment == "dev" ? module.network.public_subnets : module.network.private_subnets
   security_group = [
     module.network.allow_mysql
   ]
-  instance_type = var.rds_config["instance_type"]
+  instance_type = var.environment == "dev" ? "db.t2.micro" : var.rds_config["instance_type"]
   storage       = var.rds_config["storage"]
 }
 
 module "cache" {
-  depends_on = [module.network]
-  source     = "./modules/cache"
-  name       = var.project
-  subnets    = module.network.private_subnets
+  depends_on    = [module.network]
+  source        = "./modules/cache"
+  name          = var.project
+  domain_name   = "cache.cloudbreathe.in"
+  zone_id       = module.route53.zone_id
+  instance_type = var.environment == "dev" ? "cache.t2.micro" : var.cache_config["instance_type"]
+  subnets       = module.network.private_subnets
   security_group = [
     module.network.allow_redis,
   ]
 }
 
-module "efs" {
-  depends_on       = [module.network]
-  source           = "./modules/efs"
-  name             = var.project
-  subnets_to_mount = module.network.private_subnets
-  security_group   = [module.network.allow_nfs_sg]
-}
-
 module "asg" {
-  depends_on    = [module.network]
-  source        = "./modules/asg"
-  name          = var.project
-  image_id      = var.ec2_config["image_id"]
-  instance_type = var.ec2_config["instance_type"]
-  users         = var.ec2_config["users"]
+  depends_on     = [module.rds, module.cache]
+  source         = "./modules/asg"
+  name           = var.project
+  region         = var.region
+  environment    = var.environment
+  domain_name    = "test.cloudbreathe.in"
+  zone_id        = module.route53.zone_id
+  key_name       = var.ec2_config["key_name"]
+  image_id       = var.ec2_config["image_id"]
+  instance_type  = var.environment == "dev" ? "t2.micro" : var.ec2_config["instance_type"]
+  instance_count = var.environment == "dev" ? 1 : var.ec2_config["users"]
   security_group = [
-    module.network.allow_nfs_sg,
     module.network.allow_web_sg,
     module.network.allow_mysql
   ]
-  subnets = module.network.private_subnets
+  subnets = var.environment == "dev" ? module.network.public_subnets : module.network.private_subnets
 }
 
-module "ecr" {
-  depends_on = [module.network]
-  source     = "./modules/ecr"
-  name       = var.project
-  region     = var.region
-  environment = merge(var.ecs_environment,
-    {
-      CONTAINER_NAME = "cloudbreathe.in"
-      DB_PASS        = module.rds.db_password
-      DB_HOST        = module.rds.db_endpoint
-      DB_USER        = module.rds.db_username
-      SMTP_HOST      = "email-smtp.${var.region}.amazonaws.com"
-      SMTP_PORT      = "25"
-      SMTP_PASSWORD  = module.ses.smtp_password
-    }
-  )
-}
-
-module "ecs" {
-  depends_on = [module.ses, module.efs, module.rds, module.cache, module.load_balancer, #module.asg, 
-  module.ecr]
-  source               = "./modules/ecs"
-  name                 = var.project
-  region               = var.region
-  vpc_id               = module.network.vpc_id
-  container_config     = var.container_config
-  efs_arn              = module.efs.fs_arn
-  efs_access_point_arn = module.efs.access_point_arn
-  efs_access_point_id  = module.efs.access_point_id
-  target_group_arn     = module.load_balancer.target_group_arn
-  asg_arn              = module.asg.autoscaling_group_arn
-  moodle_image_uri     = module.ecr.moodle_image_uri
-  subnets              = module.network.private_subnets
-  efs_id               = module.efs.efs_id
-  security_group = [
-    module.network.allow_nfs_sg,
-    module.network.allow_web_sg,
-    module.network.allow_mysql
-  ]
-}

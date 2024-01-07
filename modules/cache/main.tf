@@ -1,7 +1,7 @@
 resource "aws_elasticache_cluster" "this" {
-  cluster_id           = lower("${var.name}-cluster")
+  cluster_id           = lower("${var.name}")
   engine               = "redis"
-  node_type            = "cache.t3.medium"
+  node_type            = var.instance_type
   num_cache_nodes      = 1
   parameter_group_name = "default.redis7"
   security_group_ids   = var.security_group

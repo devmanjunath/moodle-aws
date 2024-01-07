@@ -1,7 +1,9 @@
 resource "aws_launch_template" "this" {
+  count         = var.environment == "prod" ? 1 : 0
   name_prefix   = "${lower(var.name)}-template"
-  image_id      = var.image_id
+  image_id      = data.aws_ami.this.image_id
   instance_type = var.instance_type
+  key_name      = var.key_name
 
   vpc_security_group_ids = var.security_group
   iam_instance_profile {
@@ -27,13 +29,14 @@ resource "aws_launch_template" "this" {
 }
 
 resource "aws_autoscaling_group" "this" {
+  count               = var.environment == "prod" ? 1 : 0
   vpc_zone_identifier = var.subnets
-  desired_capacity    = 1
-  max_size            = 2
-  min_size            = 1
+  desired_capacity    = var.instance_count
+  max_size            = var.instance_count
+  min_size            = var.instance_count
 
   launch_template {
-    id      = aws_launch_template.this.id
+    id      = aws_launch_template.this[0].id
     version = "$Latest"
   }
 
@@ -44,6 +47,6 @@ resource "aws_autoscaling_group" "this" {
   }
 
   lifecycle {
-    ignore_changes = [ desired_capacity ]
+    ignore_changes = [desired_capacity]
   }
 }
