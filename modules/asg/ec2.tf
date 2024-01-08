@@ -2,7 +2,7 @@ resource "aws_instance" "dev_instance" {
   count                  = var.environment == "dev" ? 1 : 0
   ami                    = data.aws_ami.this.image_id
   instance_type          = var.instance_type
-  key_name               = "test-drive"
+  key_name               = var.key_name
   vpc_security_group_ids = var.security_group
   subnet_id              = var.subnets[0]
 

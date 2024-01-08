@@ -1,20 +1,20 @@
 output "db_endpoint" {
-  value = module.rds.db_endpoint
+  value = "db.${var.domain_name}"
 }
 
 output "db_username" {
   value = module.rds.db_username
 }
 
-output "cache_host" {
-  value = module.cache.cache_endpoint
+output "cache_endpoint" {
+  value = "cache.${var.domain_name}"
 }
 
-output "lb_dns_name" {
-  value = module.load_balancer.dns_name
+output "smtp_username" {
+  value = module.ses.smtp_username
 }
 
-output "db_password" {
-  value     = module.rds.db_password
+output "smtp_password" {
+  value     = module.ses.smtp_password
   sensitive = true
 }

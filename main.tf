@@ -42,22 +42,23 @@ module "network" {
 
 module "acm" {
   source      = "./modules/acm"
-  domain_name = "cloudbreathe.in"
+  domain_name = var.domain_name
 }
 
 module "route53" {
   depends_on                = [module.acm]
   source                    = "./modules/route53"
-  domain_name               = "cloudbreathe.in"
+  domain_name               = var.domain_name
   acm_arn                   = module.acm.acm_arn
   domain_validation_options = module.acm.domain_validation_options
 }
 
 module "load_balancer" {
   depends_on      = [module.network, module.acm]
+  count           = var.environment == "prod" ? 1 : 0
   source          = "./modules/load_balancer"
   name            = var.project
-  domain_name     = "test.cloudbreathe.in"
+  domain_name     = "test.${var.domain_name}"
   zone_id         = module.route53.zone_id
   acm_arn         = module.acm.acm_arn
   vpc_id          = module.network.vpc_id
@@ -68,15 +69,16 @@ module "load_balancer" {
 module "ses" {
   source = "./modules/ses"
   name   = var.project
-  email  = "manjunathpv@outlook.com"
+  email  = "manjunath.poilath@psiog.com"
 }
 
 module "rds" {
+  depends_on          = [module.network]
   source              = "./modules/rds"
   name                = var.project
   vpc_id              = module.network.vpc_id
   zone_id             = module.route53.zone_id
-  domain_name         = "db.cloudbreathe.in"
+  domain_name         = "db.${var.domain_name}"
   publicly_accessible = var.environment == "dev" ? true : false
   subnets             = var.environment == "dev" ? module.network.public_subnets : module.network.private_subnets
   security_group = [
@@ -90,7 +92,7 @@ module "cache" {
   depends_on    = [module.network]
   source        = "./modules/cache"
   name          = var.project
-  domain_name   = "cache.cloudbreathe.in"
+  domain_name   = "cache.${var.domain_name}"
   zone_id       = module.route53.zone_id
   instance_type = var.environment == "dev" ? "cache.t2.micro" : var.cache_config["instance_type"]
   subnets       = module.network.private_subnets
@@ -105,13 +107,13 @@ module "asg" {
   name             = var.project
   region           = var.region
   environment      = var.environment
-  domain_name      = "test.cloudbreathe.in"
+  domain_name      = "test.${var.domain_name}"
   zone_id          = module.route53.zone_id
   key_name         = var.ec2_config["key_name"]
   image_id         = var.ec2_config["image_id"]
   instance_type    = var.environment == "dev" ? "t2.micro" : var.ec2_config["instance_type"]
   instance_count   = var.environment == "dev" ? 1 : lookup(local.instance_map, var.users)
-  load_balancer_id = module.load_balancer.target_group_arn
+  load_balancer_id = var.environment == "dev" ? "" : module.load_balancer[0].target_group_arn
   security_group = [
     module.network.allow_web_sg,
     module.network.allow_mysql

@@ -24,8 +24,6 @@ resource "aws_launch_template" "this" {
       Name = "${lower(var.name)}-instance"
     }
   }
-
-  user_data = filebase64("${path.module}/ecs.sh")
 }
 
 resource "aws_autoscaling_group" "this" {

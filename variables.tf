@@ -16,6 +16,10 @@ variable "environment" {
   }
 }
 
+variable "domain_name" {
+  type = string
+}
+
 variable "rds_config" {
   type = object({
     instance_type = string
