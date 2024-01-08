@@ -6,4 +6,5 @@ resource "aws_elasticache_cluster" "this" {
   parameter_group_name = "default.redis7"
   security_group_ids   = var.security_group
   subnet_group_name    = aws_elasticache_subnet_group.this.name
+  apply_immediately    = true
 }

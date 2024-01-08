@@ -11,7 +11,7 @@ resource "aws_subnet" "public_subnets" {
 }
 
 resource "aws_subnet" "private_subnets" {
-  for_each                                    = tomap(var.private_subnets)
+  for_each                                    = var.environment == "prod" ? tomap(var.private_subnets) : {}
   vpc_id                                      = aws_vpc.main.id
   cidr_block                                  = each.value
   availability_zone                           = each.key

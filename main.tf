@@ -19,6 +19,16 @@ locals {
     "${var.region}b" : "10.0.5.0/24",
     "${var.region}c" : "10.0.6.0/24"
   }
+  instance_map = {
+    100  = 2
+    250  = 3
+    500  = 6
+    1000 = 12
+    2000 = 24
+    3000 = 36
+    4000 = 48
+    5000 = 60
+  }
 }
 
 module "network" {
@@ -47,7 +57,7 @@ module "load_balancer" {
   depends_on      = [module.network, module.acm]
   source          = "./modules/load_balancer"
   name            = var.project
-  domain_name     = "cloudbreathe.in"
+  domain_name     = "test.cloudbreathe.in"
   zone_id         = module.route53.zone_id
   acm_arn         = module.acm.acm_arn
   vpc_id          = module.network.vpc_id
@@ -90,17 +100,18 @@ module "cache" {
 }
 
 module "asg" {
-  depends_on     = [module.rds, module.cache]
-  source         = "./modules/asg"
-  name           = var.project
-  region         = var.region
-  environment    = var.environment
-  domain_name    = "test.cloudbreathe.in"
-  zone_id        = module.route53.zone_id
-  key_name       = var.ec2_config["key_name"]
-  image_id       = var.ec2_config["image_id"]
-  instance_type  = var.environment == "dev" ? "t2.micro" : var.ec2_config["instance_type"]
-  instance_count = var.environment == "dev" ? 1 : var.ec2_config["users"]
+  depends_on       = [module.load_balancer]
+  source           = "./modules/asg"
+  name             = var.project
+  region           = var.region
+  environment      = var.environment
+  domain_name      = "test.cloudbreathe.in"
+  zone_id          = module.route53.zone_id
+  key_name         = var.ec2_config["key_name"]
+  image_id         = var.ec2_config["image_id"]
+  instance_type    = var.environment == "dev" ? "t2.micro" : var.ec2_config["instance_type"]
+  instance_count   = var.environment == "dev" ? 1 : lookup(local.instance_map, var.users)
+  load_balancer_id = module.load_balancer.target_group_arn
   security_group = [
     module.network.allow_web_sg,
     module.network.allow_mysql

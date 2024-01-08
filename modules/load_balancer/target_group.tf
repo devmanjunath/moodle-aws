@@ -2,18 +2,18 @@ resource "aws_lb_target_group" "this" {
   name             = "${var.name}-tg"
   port             = "443"
   protocol         = "HTTPS"
-  target_type      = "ip"
+  target_type      = "instance"
   vpc_id           = var.vpc_id
   protocol_version = "HTTP1"
 
   health_check {
-    healthy_threshold   = "3"
-    interval            = "300"
     path                = "/"
-    protocol            = "HTTPS"
     port                = "443"
-    unhealthy_threshold = "10"
-    timeout             = "10"
+    protocol            = "HTTPS"
+    interval            = "30"
+    timeout             = "5"
+    healthy_threshold   = "2"
+    unhealthy_threshold = "2"
   }
 
   lifecycle {

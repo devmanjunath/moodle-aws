@@ -34,6 +34,7 @@ resource "aws_autoscaling_group" "this" {
   desired_capacity    = var.instance_count
   max_size            = var.instance_count
   min_size            = var.instance_count
+  target_group_arns   = [var.load_balancer_id]
 
   launch_template {
     id      = aws_launch_template.this[0].id

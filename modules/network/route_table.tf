@@ -10,10 +10,11 @@ resource "aws_route_table" "public_rt" {
 }
 
 resource "aws_route_table" "nat_gateway_rt" {
+  count  = var.environment == "prod" ? 1 : 0
   vpc_id = aws_vpc.main.id
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.this.id
+    nat_gateway_id = aws_nat_gateway.this[0].id
   }
   tags = {
     Name = "Route Table for NAT Gateway"
@@ -30,5 +31,5 @@ resource "aws_route_table_association" "public_rt_association" {
 resource "aws_route_table_association" "private_rt_association" {
   for_each       = aws_subnet.private_subnets
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.nat_gateway_rt.id
+  route_table_id = aws_route_table.nat_gateway_rt[0].id
 }

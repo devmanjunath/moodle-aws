@@ -6,6 +6,10 @@ output "dns_name" {
   value = aws_lb.this.dns_name
 }
 
-output "zone_id"{
+output "zone_id" {
   value = aws_lb.this.zone_id
+}
+
+output "elb_id" {
+  value = aws_lb.this.id
 }

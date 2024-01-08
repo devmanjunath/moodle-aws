@@ -19,8 +19,10 @@ resource "aws_db_instance" "this" {
   vpc_security_group_ids    = var.security_group
   skip_final_snapshot       = false
   publicly_accessible       = var.publicly_accessible
-  db_name                   = "moodle"
   final_snapshot_identifier = "${var.name}-snapshot-${formatdate("YYYYMMDDhhmmss", timestamp())}"
   copy_tags_to_snapshot     = true
   snapshot_identifier       = try(data.aws_db_snapshot.latest_snapshot.id, null)
+  lifecycle {
+    ignore_changes = [snapshot_identifier]
+  }
 }
