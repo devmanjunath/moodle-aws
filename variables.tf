@@ -29,7 +29,6 @@ variable "rds_config" {
 
 variable "ec2_config" {
   type = object({
-    image_id      = string
     instance_type = string
     key_name      = string
   })

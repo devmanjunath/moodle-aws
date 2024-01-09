@@ -40,17 +40,23 @@ module "network" {
   private_subnets = local.private_subnets
 }
 
-module "acm" {
-  source      = "./modules/acm"
+module "public_route53" {
+  source      = "./modules/route53"
+  name        = var.project
   domain_name = var.domain_name
 }
 
-module "route53" {
-  depends_on                = [module.acm]
-  source                    = "./modules/route53"
-  domain_name               = var.domain_name
-  acm_arn                   = module.acm.acm_arn
-  domain_validation_options = module.acm.domain_validation_options
+module "private_route53" {
+  source      = "./modules/route53"
+  name        = var.project
+  domain_name = "psiog.internal"
+  vpc_id      = module.network.vpc_id
+}
+
+module "acm" {
+  source      = "./modules/acm"
+  domain_name = var.domain_name
+  zone_id     = module.public_route53.zone_id
 }
 
 module "load_balancer" {
@@ -59,7 +65,7 @@ module "load_balancer" {
   source          = "./modules/load_balancer"
   name            = var.project
   domain_name     = "test.${var.domain_name}"
-  zone_id         = module.route53.zone_id
+  zone_id         = module.public_route53.zone_id
   acm_arn         = module.acm.acm_arn
   vpc_id          = module.network.vpc_id
   security_groups = [module.network.allow_web_sg]
@@ -77,7 +83,7 @@ module "rds" {
   source              = "./modules/rds"
   name                = var.project
   vpc_id              = module.network.vpc_id
-  zone_id             = module.route53.zone_id
+  zone_id             = "module.route53.zone_id"
   domain_name         = "db.${var.domain_name}"
   publicly_accessible = var.environment == "dev" ? true : false
   subnets             = var.environment == "dev" ? module.network.public_subnets : module.network.private_subnets
@@ -93,7 +99,7 @@ module "cache" {
   source        = "./modules/cache"
   name          = var.project
   domain_name   = "cache.${var.domain_name}"
-  zone_id       = module.route53.zone_id
+  zone_id       = "module.route53.zone_id"
   instance_type = var.environment == "dev" ? "cache.t2.micro" : var.cache_config["instance_type"]
   subnets       = module.network.private_subnets
   security_group = [
@@ -108,7 +114,7 @@ module "asg" {
   region           = var.region
   environment      = var.environment
   domain_name      = "test.${var.domain_name}"
-  zone_id          = module.route53.zone_id
+  zone_id          = "module.route53.zone_id"
   key_name         = var.ec2_config["key_name"]
   image_id         = var.ec2_config["image_id"]
   instance_type    = var.environment == "dev" ? "t2.micro" : var.ec2_config["instance_type"]

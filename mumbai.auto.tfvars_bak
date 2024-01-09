@@ -1,17 +1,16 @@
-region      = "ap-south-1"
-project     = "Test-Drive"
-environment = "dev"
+region      = "{REGION}"
+project     = "{PROJECT}"
+environment = "{ENVIRONMENT}"
+domain_name = "{DOMAIN_NAME}"
 
 rds_config = {
-  instance_type = "db.m7g.large"
-  storage       = 30
+  instance_type = "db.t2.large"
+  storage       = {STORAGE_TYPE}
 }
 
 ec2_config = {
-  image_id      = "ami-0345c0581a1b3637a"
-  instance_type = "m5.large"
-  users         = 300
-  key_name      = "test-drive"
+  instance_type = "m5.medium"
+  key_name      = "{KEY_NAME}"
 }
 
 cache_config = {
