@@ -1,4 +1,4 @@
-resource "aws_instance" "dev_instance" {
+resource "aws_instance" "this" {
   count                  = var.environment == "dev" ? 1 : 0
   ami                    = data.aws_ami.this.image_id
   instance_type          = var.instance_type
@@ -28,11 +28,8 @@ resource "aws_instance" "dev_instance" {
   }
 }
 
-resource "aws_route53_record" "lb_record" {
-  count   = var.environment == "dev" ? 1 : 0
-  zone_id = var.zone_id
-  name    = var.domain_name
-  type    = "A"
-  ttl     = 300
-  records = [aws_instance.dev_instance[0].public_ip]
+resource "aws_lb_target_group_attachment" "test" {
+  target_group_arn = var.target_group_arn
+  target_id        = aws_instance.this[0].id
+  port             = 80
 }

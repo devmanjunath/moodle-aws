@@ -83,7 +83,7 @@ Make sure to destroy the cloud resources deployed via terraform to avoid incurri
    ```
 2. Now destroy the resources on cloud
    ```console
-   foo@user:~/Documents/moodle-aws$ terraform destroy --auto-approve
+   foo@user:~/Documents/moodle-aws$ terraform destroy --target=module.network --auto-approve
    ```
 3. This process would also take the same time as **apply**, depending upon the resources created on the AWS cloud.
 

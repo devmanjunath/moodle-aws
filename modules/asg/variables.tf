@@ -26,11 +26,6 @@ variable "key_name" {
   type = string
 }
 
-variable "image_id" {
-  type    = string
-  default = "ami-0345c0581a1b3637a"
-}
-
 variable "instance_type" {
   type    = string
   default = "m5.large"
@@ -46,5 +41,9 @@ variable "environment" {
 }
 
 variable "load_balancer_id" {
+  type = string
+}
+
+variable "target_group_arn" {
   type = string
 }
