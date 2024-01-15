@@ -120,7 +120,7 @@ module "cache" {
 }
 
 module "asg" {
-  depends_on       = [module.load_balancer]
+  depends_on       = [module.load_balancer, module.rds]
   source           = "./modules/asg"
   name             = var.project
   region           = var.region
@@ -130,7 +130,7 @@ module "asg" {
   key_name         = var.ec2_config["key_name"]
   instance_type    = var.environment == "dev" ? "t2.micro" : var.ec2_config["instance_type"]
   instance_count   = var.environment == "dev" ? 1 : lookup(local.instance_map, var.users)
-  load_balancer_id = var.environment == "dev" ? "" : module.load_balancer[0].target_group_arn
+  load_balancer_id = module.load_balancer.target_group_arn
   security_group = [
     module.network.allow_web_sg,
     module.network.allow_mysql

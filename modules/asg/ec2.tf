@@ -29,6 +29,7 @@ resource "aws_instance" "this" {
 }
 
 resource "aws_lb_target_group_attachment" "test" {
+  count            = var.environment == "dev" ? 1 : 0
   target_group_arn = var.target_group_arn
   target_id        = aws_instance.this[0].id
   port             = 80
