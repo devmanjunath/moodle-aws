@@ -1,1 +1,7 @@
-﻿
+﻿arn:aws:backup:ap-south-1:480174253711:recovery-point:e4225fe0-82e0-4ae4-9109-77cfe7cbcc66
+arn:aws:backup:ap-south-1:480174253711:recovery-point:a46129da-81fb-4386-9ee5-da2a09e83732
+arn:aws:backup:ap-south-1:480174253711:recovery-point:2fbc2398-54c4-40b3-acf1-3641fc423c89
+arn:aws:backup:ap-south-1:480174253711:recovery-point:e4d98702-da9b-4d27-a280-910ca1c828ca
+arn:aws:backup:ap-south-1:480174253711:recovery-point:efec955c-b4f9-45b4-982f-fee7a3e516e3
+arn:aws:backup:ap-south-1:480174253711:recovery-point:f00c01e8-091b-46dc-8f0c-02e7858a08e9
+arn:aws:backup:ap-south-1:480174253711:recovery-point:5d3a0278-80f5-4f37-9285-fd3c0fc5c887

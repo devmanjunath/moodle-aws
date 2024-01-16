@@ -2,7 +2,13 @@
 locals {
   user_data = <<-EOF
                 #!/bin/bash
-                sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs.psiog.internal:/ /var/www/moodledata")
+                latest_folder=$(sudo find /var/efs -type d -name "aws-backup-restore*" -exec ls -ld --time=creation {} + | sort -k6,7 | tail -n 1 | awk '{print $NF}')
+                cd "$latest_folder"
+                sudo cp moodledata /var/efs/ -R
+                cd /var/efs
+                sudo find /var/efs -type d -name "aws-backup-restore*" -exec ls -ld --time=creation {} + | sort -k6,7 | tail -n 1 | sudo xargs rm -r
+                sudo chown -R www-data /var/efs/moodledata
+                sudo chmod -R 777 /var/efs/moodledata
                 EOF
 }
 
