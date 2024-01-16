@@ -1,0 +1,1 @@
+aws backup list-recovery-points-by-backup-vault --region ap-south-1 --backup-vault-name terraform_backup_vault --query "sort_by(RecoveryPoints, &CompletionDate)[::-1].{RecoveryPointArn:RecoveryPointArn}" --output text > restore.txt

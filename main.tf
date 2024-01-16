@@ -90,6 +90,16 @@ module "ses" {
   name   = var.project
 }
 
+module "efs" {
+  depends_on       = [module.network]
+  source           = "./modules/efs"
+  name             = var.project
+  subnets_to_mount = var.environment == "dev" ? module.network.public_subnets : module.network.private_subnets
+  domain_name      = "fs.psiog.internal"
+  zone_id          = module.private_route53.zone_id
+  security_group   = [module.network.allow_efs]
+}
+
 module "rds" {
   depends_on          = [module.network]
   source              = "./modules/rds"
@@ -120,7 +130,7 @@ module "cache" {
 }
 
 module "asg" {
-  depends_on       = [module.load_balancer, module.rds]
+  depends_on       = [module.load_balancer, module.rds, module.efs]
   source           = "./modules/asg"
   name             = var.project
   region           = var.region
@@ -133,7 +143,9 @@ module "asg" {
   load_balancer_id = module.load_balancer.target_group_arn
   security_group = [
     module.network.allow_web_sg,
-    module.network.allow_mysql
+    module.network.allow_mysql,
+    module.network.allow_redis,
+    module.network.allow_efs
   ]
   subnets          = var.environment == "dev" ? module.network.public_subnets : module.network.private_subnets
   target_group_arn = module.load_balancer.target_group_arn

@@ -5,7 +5,7 @@ resource "aws_instance" "this" {
   key_name               = var.key_name
   vpc_security_group_ids = var.security_group
   subnet_id              = var.subnets[0]
-
+  user_data              = local.user_data
   tags = {
     Name      = "${var.name}-${var.environment}"
     Timestamp = replace(timestamp(), ":", ".")

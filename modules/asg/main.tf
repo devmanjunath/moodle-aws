@@ -1,3 +1,11 @@
+
+locals {
+  user_data = <<-EOF
+                #!/bin/bash
+                sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs.psiog.internal:/ /var/www/moodledata")
+                EOF
+}
+
 resource "aws_launch_template" "this" {
   count         = var.environment == "prod" ? 1 : 0
   name_prefix   = "${lower(var.name)}-template"
@@ -24,6 +32,7 @@ resource "aws_launch_template" "this" {
       Name = "${lower(var.name)}-instance"
     }
   }
+  user_data = local.user_data
 }
 
 resource "aws_autoscaling_group" "this" {

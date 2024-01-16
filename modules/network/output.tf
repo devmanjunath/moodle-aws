@@ -25,3 +25,7 @@ output "allow_mysql" {
 output "allow_redis" {
   value = aws_security_group.allow_redis.id
 }
+
+output "allow_efs" {
+  value = aws_security_group.allow_nfs.id
+}
