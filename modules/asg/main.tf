@@ -38,7 +38,7 @@ resource "aws_launch_template" "this" {
       Name = "${lower(var.name)}-instance"
     }
   }
-  user_data = local.user_data
+  user_data = base64encode(local.user_data)
 }
 
 resource "aws_autoscaling_group" "this" {
